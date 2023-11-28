@@ -8,6 +8,11 @@
 #include <glut.h>
 #include <iostream>
 #include <math.h>
+#include <vector>
+#include <chrono>
+#include <random>
+
+
 
 //=======================================================================
 // Constants
@@ -25,6 +30,9 @@ GLdouble fovy = 45.0;
 GLdouble aspectRatio = (GLdouble)WIDTH / (GLdouble)HEIGHT;
 GLdouble zNear = 0.1;
 GLdouble zFar = 100000;
+
+int MAX_NUMBER_OF_ENEMIES = 6;
+float MIN_ENEMY_CLOSENESS = 4; // No Two Enemies will be closer than this value;
 
 
 
@@ -194,8 +202,30 @@ GLTexture tex_ground;
 bool firstPersonModeOn = false;
 int movementState = 0;
 
+// Obstacles
+
+std::vector<GameObject> enemySnakes;
 
 Camera camera;
+
+//=======================================================================
+// Misc. Functions
+//=======================================================================
+
+double compareDistances(Vector a, Vector b) {
+	return sqrtf(
+		std::fabs(a.x - b.x) * std::fabs(a.x - b.x) +
+		std::fabs(a.y - b.y) * std::fabs(a.y - b.y) +
+		std::fabs(a.z - b.z) * std::fabs(a.z - b.z));
+}
+
+int getRandomInt(int min, int max) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> distribution(min, max);
+	return distribution(gen);
+}
+
 //=======================================================================
 // Set Up Camera Function
 //=======================================================================
@@ -267,7 +297,7 @@ void myInit(void)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 
-
+	srand(time(0));
 
 	setupCamera();
 	//*******************************************************************************************//
@@ -281,7 +311,6 @@ void myInit(void)
 
 	// {PositionX, PositionY, PositionZ }, Rotation, Scale, Collision Radius, "Path to model file"
 	aladdin = GameObject({ 0,0,0 }, 0, 0.04, 0.5, "models/aladdin/aladdin.3ds");
-	snake = GameObject({ 7,0,0.9 }, 0, 0.03, 0.5, "models/snake/snake.3ds");
 	bottle = GameObject({ -7,2,0.9 }, 0, 0.08, 0.5, "models/bottle/bottle.3ds");
 
 	glEnable(GL_DEPTH_TEST);
@@ -338,8 +367,12 @@ void myDisplay(void)
 
 	// Drawing the Game Objects
 	aladdin.draw();
-	snake.draw();
+	
 	bottle.draw();
+
+	for (GameObject snake : enemySnakes) {
+		snake.draw();
+	}
 
 	//sky box
 	glPushMatrix();
@@ -407,7 +440,41 @@ void myTimer(int) {
 	setCameraFollow();
 	setupCamera();
 
+	// Add Enemy Snakes
 
+	std::cout << "Position X: " << aladdin.position.x << std::endl;
+	std::cout << "Position Z: " << aladdin.position.z << std::endl;
+
+
+	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
+		float newSnakeX;
+		float newSnakeZ;
+		Vector newSnakePosition;
+
+		bool tooClose = false;
+
+		while (true) {
+			tooClose = false;
+
+			newSnakeX = getRandomInt(-58, 58);
+			newSnakeZ = getRandomInt(-58, 58);
+			newSnakePosition = { newSnakeX,0,newSnakeZ };
+
+			for (GameObject otherSnake : enemySnakes) {
+				if (compareDistances(otherSnake.position, newSnakePosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+
+			if (!tooClose) {
+				break;
+			}
+		
+		}
+
+		GameObject newSnake = GameObject(newSnakePosition, 0, 0.03, 0.5, "models/snake/snake.3ds");
+
+		enemySnakes.push_back(newSnake);
+	}
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, myTimer, 0);
