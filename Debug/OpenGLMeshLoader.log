@@ -1,5 +1,1 @@
-﻿  Main.cpp
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\Main.cpp(449,28): warning C4018: '<': signed/unsigned mismatch
-  OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe
+﻿  OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe

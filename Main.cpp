@@ -17,8 +17,10 @@
 //=======================================================================
 // Constants
 //=======================================================================
-
+float q = 0;
 #define DEG2RAD(a) (a * 0.0174532925)
+const float gravity= -0.3;
+const float initJumpVel = 5;
 
 int WIDTH = 1280;
 int HEIGHT = 720;
@@ -31,8 +33,8 @@ GLdouble aspectRatio = (GLdouble)WIDTH / (GLdouble)HEIGHT;
 GLdouble zNear = 0.1;
 GLdouble zFar = 100000;
 
-int MAX_NUMBER_OF_ENEMIES = 6;
-float MIN_ENEMY_CLOSENESS = 4; // No Two Enemies will be closer than this value;
+int MAX_NUMBER_OF_ENEMIES = 4;
+float MIN_ENEMY_CLOSENESS = 5; // No Two Enemies will be closer than this value;
 
 
 
@@ -83,16 +85,21 @@ public:
 	float scale;
 	float collisionRadius;
 	Model_3DS gameObjectModel;
-
-
+	bool displayed;
+	bool needsRotation;
+	bool isCave = false;
 	GameObject() {
 	}
 
 
-	GameObject(Vector position, float rotation, float scale, float collisionRadius, char* pathToModel) {
+	GameObject(Vector position, float rotation, float scale, float collisionRadius, char* pathToModel,bool needsRotation 
+	) {
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
+		this->displayed = true;
+		this->needsRotation = needsRotation;
+		
 		this->collisionRadius = collisionRadius;
 		gameObjectModel.Load(pathToModel);
 	}
@@ -104,6 +111,10 @@ public:
 	void setRotation(float rotation) {
 		this->rotation = rotation;
 	}
+	void setDisapear() {
+		this->displayed = false;
+	}
+
 
 	void setScale(float scale) {
 		this->scale = scale;
@@ -118,7 +129,24 @@ public:
 		glTranslatef(position.x, position.y, position.z);
 		glRotatef(rotation, 0, 1, 0);
 		glScalef(scale, scale, scale);
+		if (needsRotation) {
+			glPushMatrix();
+			glRotatef(90, 1, 0, 0);
+
+		}
+
+
+		if (isCave){
+			glPushMatrix();
+			glTranslatef(1375, 1455, 0);
+			glRotatef(135, 0, 0, 1);
+			
+
+	}
 		gameObjectModel.Draw();
+		if (needsRotation) {
+			glPopMatrix();
+		}
 		glPopMatrix();
 	}
 
@@ -177,14 +205,28 @@ public:
 	}
 };
 
+int score = 0;
+
+void drawScore() {
+	glPushMatrix();
 
 
+	// Position the score text at the top-left corner of the window
+	glRasterPos3f(0.0, 0.92,0.0);
+
+	char scoreText[50];
+	snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
+
+	for (int i = 0; scoreText[i] != '\0'; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, scoreText[i]);
+	}
+	glPopMatrix();
+}
 //=======================================================================
 // Variables
 //=======================================================================
 
 GLuint tex;
-
 int cameraZoom = 0;
 
 float cameraDistanceFromPlayer = 17.0f;
@@ -192,6 +234,8 @@ float cameraHeightAbovePlayer = 10.0f;
 
 // Game Objects
 GameObject aladdin;
+GameObject cave;
+
 GameObject snake;
 GameObject bottle;
 
@@ -205,13 +249,21 @@ int movementState = 0;
 // Obstacles
 
 std::vector<GameObject> enemySnakes;
+std::vector<GameObject> water;
 
+
+std::vector<GameObject> rocks;
+
+float playerVerticalVelocity = 0.0;
+bool endOne = false;
 Camera camera;
 
 //=======================================================================
 // Misc. Functions
 //=======================================================================
-
+void jump() {
+	playerVerticalVelocity = initJumpVel;
+}
 double compareDistances(Vector a, Vector b) {
 	return sqrtf(
 		std::fabs(a.x - b.x) * std::fabs(a.x - b.x) +
@@ -309,9 +361,15 @@ void myInit(void)
 	InitLightSource();
 	InitMaterial();
 
-	// {PositionX, PositionY, PositionZ }, Rotation, Scale, Collision Radius, "Path to model file"
-	aladdin = GameObject({ 0,0,0 }, 0, 0.04, 0.5, "models/aladdin/aladdin.3ds");
-	bottle = GameObject({ -7,2,0.9 }, 0, 0.08, 0.5, "models/bottle/bottle.3ds");
+	// {PositionX, PositionY, PositionZ 
+	// 
+	// 
+	// }, Rotation, Scale, Collision Radius, "Path to model file"
+	aladdin = GameObject({ 0,0,0 }, 0, 0.04, 0.5, "models/aladdin/aladdin.3ds",true);
+	cave = GameObject({20,0,20 }, 0, 0.02, 0.5, "models/cave/cave.3ds",true);
+	cave.isCave = true;
+	//snake = GameObject({ 7,0,0.9 }, 0, 0.03, 0.5, "models/snake/snake.3ds");
+	//bottle = GameObject({ -7,0,0.9 }, 0, 0.08, 0.5, "models/bottle/bottle.3ds");
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
@@ -364,29 +422,66 @@ void myDisplay(void)
 
 	// Draw Ground
 	RenderGround();
+	glPushMatrix();
+	
 
 	// Drawing the Game Objects
 	aladdin.draw();
-	
-	bottle.draw();
-
-	for (GameObject snake : enemySnakes) {
-		snake.draw();
-	}
-
-	//sky box
-	glPushMatrix();
-	GLUquadricObj* qobj;
-	qobj = gluNewQuadric();
-	glTranslated(50, 0, 0);
-	glRotated(90, 1, 0, 1);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	gluQuadricTexture(qobj, true);
-	gluQuadricNormals(qobj, GL_SMOOTH);
-	gluSphere(qobj, 100, 100, 100);
-	gluDeleteQuadric(qobj);
 	glPopMatrix();
+	//sky box
 
+
+	drawScore();
+	if (!endOne) {
+		glPushMatrix();
+		GLUquadricObj* qobj;
+		qobj = gluNewQuadric();
+		glTranslated(50, 0, 0);
+		glRotated(90, 1, 0, 1);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		gluQuadricTexture(qobj, true);
+		gluQuadricNormals(qobj, GL_SMOOTH);
+		gluSphere(qobj, 100, 100, 100);
+		gluDeleteQuadric(qobj);
+		glPopMatrix();
+		glPushMatrix();
+
+		cave.draw();
+		glPopMatrix();
+
+
+
+		for (GameObject snake : enemySnakes) {
+
+			glPushMatrix();
+
+			snake.draw();
+			glPopMatrix();
+		}
+
+		for (GameObject wateri : water) {
+			if (wateri.displayed) {
+				glPushMatrix();
+				glTranslatef(0.0, 1.1, 0.0);
+
+
+				wateri.draw();
+				glPopMatrix();
+			}
+		}
+
+		for (GameObject rock : rocks) {
+			glPushMatrix();
+			// Dim the ground texture a bits
+
+			rock.draw();
+			glPopMatrix();
+		}
+	}
+	else {
+
+
+	}
 	glutSwapBuffers();
 }
 
@@ -434,16 +529,48 @@ void setCameraFollow() {
 // Timer Function
 //=======================================================================
 
+bool checkCollitionObstacles() {
+
+	for (int i = 0; i < enemySnakes.size(); i++) {
+		if (compareDistances(aladdin.position, enemySnakes[i].position) < 3.0)
+			std::cout << "d: " << q << std::endl;
+
+			return true;
+	}
+	for (int i = 0; i < rocks.size(); i++) {
+		if (compareDistances(aladdin.position, rocks[i].position) < 3.0)
+			std::cout << "f: " << q << std::endl;
+
+			return true;
+	}
+
+	return false;
+}
+void checkCollitionCollectables() {
+	for (int i = 0; i < water.size(); i++) {
+		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius) {
+
+			water[i].setDisapear();
+			score++;
+		}
+	}
+
+}
+void checkEndOne() {
+	if (compareDistances(aladdin.position, cave.position) < aladdin.collisionRadius + cave.collisionRadius) { endOne = true; }
+
+
+}
+
 void myTimer(int) {
 
-	
 	setCameraFollow();
 	setupCamera();
 
 	// Add Enemy Snakes
 
-	std::cout << "Position X: " << aladdin.position.x << std::endl;
-	std::cout << "Position Z: " << aladdin.position.z << std::endl;
+	//std::cout << "Position X: " << aladdin.position.x << std::endl;
+	//std::cout << "Position Z: " << aladdin.position.z << std::endl;
 
 
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
@@ -471,16 +598,95 @@ void myTimer(int) {
 		
 		}
 
-		GameObject newSnake = GameObject(newSnakePosition, 0, 0.03, 0.5, "models/snake/snake.3ds");
+		GameObject newSnake = GameObject(newSnakePosition, 0, 0.03, 0.5, "models/snake/snake.3ds",true);
 
 		enemySnakes.push_back(newSnake);
 	}
+	while (rocks.size() < MAX_NUMBER_OF_ENEMIES) {
+		float newRockX;
+		float newRockZ;
+		Vector newRockPosition;
 
+		bool tooClose = false;
+
+		while (true) {
+			tooClose = false;
+
+			newRockX = getRandomInt(-58, 58);
+			newRockZ = getRandomInt(-58, 58);
+			newRockPosition = { newRockX,0,newRockZ };
+
+			for (GameObject otherSnake : enemySnakes) {
+				if (compareDistances(otherSnake.position, newRockPosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+			for (GameObject otherRocks : rocks) {
+				if (compareDistances(otherRocks.position, newRockPosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+
+
+			if (!tooClose) {
+				break;
+			}
+
+		}
+
+		GameObject newRock = GameObject(newRockPosition, 0, 0.3, 0.5, "models/rock1/rock.3ds",true);
+
+		rocks.push_back(newRock);
+	}
+
+	while (water.size() < MAX_NUMBER_OF_ENEMIES) {
+		float newWaterX;
+		float newWaterZ;
+		Vector newWaterPosition;
+
+		bool tooClose = false;
+
+		while (true) {
+			tooClose = false;
+
+			newWaterX = getRandomInt(-58, 58);
+			newWaterZ = getRandomInt(-58, 58);
+			newWaterPosition = { newWaterX,0,newWaterZ };
+
+			for (GameObject otherSnake : enemySnakes) {
+				if (compareDistances(otherSnake.position, newWaterPosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+			for (GameObject otherRocks : rocks) {
+				if (compareDistances(otherRocks.position, newWaterPosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+			for (GameObject otherWater : water) {
+				if (compareDistances(otherWater.position, newWaterPosition) < MIN_ENEMY_CLOSENESS)
+					tooClose = true;
+			}
+
+
+			if (!tooClose) {
+				break;
+			}
+
+		}
+
+		GameObject newWater = GameObject(newWaterPosition, 0,0.09, 0.5, "models/bottle/bottle.3ds",true);
+
+		water.push_back(newWater);
+	}
+	aladdin.position.y += playerVerticalVelocity;
+	playerVerticalVelocity+= gravity ;
+	if (aladdin.position.y < 0) {
+		aladdin.position.y = 0;
+		playerVerticalVelocity = 0;
+	}
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, myTimer, 0);
 
 }
-
+float nplayerX = 0.0;
+float nplayerZ = 0.0;
 //=======================================================================
 // Keyboard Function
 //=======================================================================
@@ -492,8 +698,63 @@ void myKeyboard(unsigned char button, int x, int y)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
 		break;
+	case 'v':
+		q += 5;
+		break;
+	case 'e':
+		q -= 5;
+		break;
 	case 'r':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+
+	case 'k':
+		 nplayerZ = aladdin.position.z - 0.1;
+	
+		aladdin.setRotation(0);
+		aladdin.position.z -= 0.1;
+			break;
+		
+	case 'u':
+		 nplayerX = aladdin.position.x - 0.1;
+
+			// Move the player forward
+		
+				aladdin.position.x -= 0.1;
+				aladdin.setRotation ( 15);
+			
+		
+		break;
+	case 'j':
+		 nplayerX = aladdin.position.x + 0.1;
+
+		
+			
+				// Move the player backward
+				aladdin.position.x += 0.1;
+				aladdin.setRotation(-15);
+			
+		
+		break;
+		//	case 'k':
+				// Rotate the player to the left
+
+				//playerZ -= 0.1;
+
+				//break;
+	case 'h':
+		nplayerZ = aladdin.position.z + 0.1;
+
+		// Rotate the player to the right
+	aladdin.setRotation(180);
+			
+	aladdin.position.z += 0.1;
+			
+		
+		break;
+
+	case 'x':
+		jump();
 		break;
 	case 'f':
 		if (!firstPersonModeOn) {
@@ -519,32 +780,64 @@ void myKeyboard(unsigned char button, int x, int y)
 //=======================================================================
 // Special Function
 //=======================================================================
+int temp = 0;
 void mySpecial(int key, int x, int y) {
 	float a = 1.0;
-
-	const float xChange[] = {0,-1,0,1};
-	const float zChange[] = {1,0,-1,0};
+	float rh = std::sqrtf(1.0 / 2.0);
+	const float xChange[] = {0.0,-rh,-1.0,-rh,0.0,rh,1.0,rh};
+	const float zChange[] = { 1.0,rh,0.0,-rh,-1.0,-rh,0.0,rh};
 
 	switch (key) {
 	case GLUT_KEY_UP:
+
 		aladdin.position.x += xChange[movementState];
 		aladdin.position.z += zChange[movementState];
+		if (checkCollitionObstacles()==true) {
+			std::cout << "q: " << q << std::endl;
+
+			//aladdin.position.x -= xChange[movementState];
+			//aladdin.position.z -= zChange[movementState];
+		}
+		checkCollitionCollectables();
 		break;
 	case GLUT_KEY_DOWN:
-		movementState = (movementState + 2) % 4;
+		movementState = (movementState + 4) % 8;
 		aladdin.setRotation(aladdin.rotation - 180);
+		checkCollitionCollectables();
+
 		break;
+
 	case GLUT_KEY_LEFT:
-		movementState = (movementState - 1 + 4) % 4;
-		aladdin.setRotation(aladdin.rotation + 90);
+		temp = movementState;
+		movementState = (movementState - 1 + 8) % 8;
+		aladdin.setRotation(aladdin.rotation + 45);
+		if (checkCollitionObstacles()) {
+			movementState = temp;
+			
+		}
+		checkCollitionCollectables();
+
 		break;
 	case GLUT_KEY_RIGHT:
-		movementState = (movementState + 1) % 4;
-		aladdin.setRotation(aladdin.rotation - 90);
+		temp = movementState;
+
+		movementState = (movementState + 1) % 8;
+		aladdin.setRotation(aladdin.rotation - 45);
+		if (checkCollitionObstacles()) {
+			movementState = temp;
+
+		}
+		checkCollitionCollectables();
+
 		break;
+
 	}
+	
+		
+
 
 }
+
 
 //=======================================================================
 // Motion Function
@@ -572,7 +865,12 @@ void myMouse(int button, int state, int x, int y)
 	{
 		cameraZoom = y;
 	}
+	if (state == GLUT_UP)
+	{
+
+	}
 }
+
 
 //=======================================================================
 // Reshape Function

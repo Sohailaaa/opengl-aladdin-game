@@ -1,0 +1,47 @@
+# Material file for 001fba85.obj
+
+newmtl steghost01mat
+	Ns 38
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 1.0 1.0 1.0
+	map_Kd steghost01.PNG
+
+newmtl steghost05mat
+	Ns 12
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 1.0 1.0 1.0
+	map_Kd steghost05.PNG
+
+newmtl steghost04mat
+	Ns 12
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 1.0 1.0 1.0
+	map_Kd steghost04.PNG
+
+newmtl steghost03mat
+	Ns 12
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 1.0 1.0 1.0
+	map_Kd steghost03.PNG
+
+newmtl steghost02mat
+	Ns 12
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 1.0 1.0 1.0
+	map_Kd steghost02.PNG
+
