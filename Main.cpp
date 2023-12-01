@@ -904,8 +904,14 @@ void myReshape(int w, int h)
 void LoadAssets()
 {
 	// Loading texture files
-	tex_ground.Load("Textures/sand.bmp");
-	loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
+	if (!endOne) {
+		tex_ground.Load("Textures/sand.bmp");
+		loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
+	}
+	else {
+
+
+	}
 }
 
 
