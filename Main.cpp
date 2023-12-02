@@ -19,7 +19,7 @@
 //=======================================================================
 float q = 0;
 #define DEG2RAD(a) (a * 0.0174532925)
-const float gravity= -0.3;
+const float gravity = -0.3;
 const float initJumpVel = 5;
 
 int WIDTH = 1280;
@@ -92,14 +92,14 @@ public:
 	}
 
 
-	GameObject(Vector position, float rotation, float scale, float collisionRadius, char* pathToModel,bool needsRotation 
+	GameObject(Vector position, float rotation, float scale, float collisionRadius, char* pathToModel, bool needsRotation
 	) {
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
 		this->displayed = true;
 		this->needsRotation = needsRotation;
-		
+
 		this->collisionRadius = collisionRadius;
 		gameObjectModel.Load(pathToModel);
 	}
@@ -136,13 +136,13 @@ public:
 		}
 
 
-		if (isCave){
+		if (isCave) {
 			glPushMatrix();
 			glTranslatef(1375, 1455, 0);
 			glRotatef(135, 0, 0, 1);
-			
 
-	}
+
+		}
 		gameObjectModel.Draw();
 		if (needsRotation) {
 			glPopMatrix();
@@ -212,7 +212,7 @@ void drawScore() {
 
 
 	// Position the score text at the top-left corner of the window
-	glRasterPos3f(0.0, 0.92,0.0);
+	glRasterPos3f(0.0, 0.92, 0.0);
 
 	char scoreText[50];
 	snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
@@ -256,6 +256,13 @@ std::vector<GameObject> rocks;
 
 float playerVerticalVelocity = 0.0;
 bool endOne = false;
+double speX = 0;
+double speZ = 0;
+bool flagFront = true;
+bool flagBack = false;
+bool flagRight = false;
+bool flagLeft = false;
+
 Camera camera;
 
 //=======================================================================
@@ -365,8 +372,8 @@ void myInit(void)
 	// 
 	// 
 	// }, Rotation, Scale, Collision Radius, "Path to model file"
-	aladdin = GameObject({ 0,0,0 }, 0, 0.04, 0.5, "models/aladdin/aladdin.3ds",true);
-	cave = GameObject({20,0,20 }, 0, 0.02, 0.5, "models/cave/cave.3ds",true);
+	aladdin = GameObject({ 0,0,0 }, 0, 0.04, 0.5, "models/aladdin/aladdin.3ds", true);
+	cave = GameObject({ 20,0,20 }, 0, 0.02, 0.5, "models/cave/cave.3ds", true);
 	cave.isCave = true;
 	//snake = GameObject({ 7,0,0.9 }, 0, 0.03, 0.5, "models/snake/snake.3ds");
 	//bottle = GameObject({ -7,0,0.9 }, 0, 0.08, 0.5, "models/bottle/bottle.3ds");
@@ -382,25 +389,25 @@ void RenderGround()
 {
 	glDisable(GL_LIGHTING);	// Disable lighting 
 
-	glColor3f(0.6, 0.6, 0.6);	// Dim the ground texture a bit
+	glColor3f(0.2, 0.2, 0.2);	// Dim the ground texture a bit
 
 	glEnable(GL_TEXTURE_2D);	// Enable 2D texturing
 
 	glBindTexture(GL_TEXTURE_2D, tex_ground.texture[0]);	// Bind the ground texture
 
 	glPushMatrix();
-		glScalef(3.0, 3.0, 3.0);	// Scale the ground quad	
-		glBegin(GL_QUADS);
-			glNormal3f(0, 1, 0);	// Set quad normal direction.
-			glTexCoord2f(0, 0);		// Set tex coordinates ( Using (0,0) -> (5,5) with texture wrapping set to GL_REPEAT to simulate the ground repeated grass texture).
-			glVertex3f(-20, 0, -20);
-			glTexCoord2f(5, 0);
-			glVertex3f(20, 0, -20);
-			glTexCoord2f(5, 5);
-			glVertex3f(20, 0, 20);
-			glTexCoord2f(0, 5);
-			glVertex3f(-20, 0, 20);
-		glEnd();
+	glScalef(3.0, 3.0, 3.0);	// Scale the ground quad	
+	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0);	// Set quad normal direction.
+	glTexCoord2f(0, 0);		// Set tex coordinates ( Using (0,0) -> (5,5) with texture wrapping set to GL_REPEAT to simulate the ground repeated grass texture).
+	glVertex3f(-20, 0, -20);
+	glTexCoord2f(5, 0);
+	glVertex3f(20, 0, -20);
+	glTexCoord2f(5, 5);
+	glVertex3f(20, 0, 20);
+	glTexCoord2f(0, 5);
+	glVertex3f(-20, 0, 20);
+	glEnd();
 	glPopMatrix();
 
 	glEnable(GL_LIGHTING);	// Enable lighting again for other entites coming throung the pipeline.
@@ -423,11 +430,42 @@ void myDisplay(void)
 	// Draw Ground
 	RenderGround();
 	glPushMatrix();
-	
+
 
 	// Drawing the Game Objects
-	aladdin.draw();
-	glPopMatrix();
+	//aladdin.draw();
+	//glPopMatrix();
+	if (flagFront) {
+		//PLAYER
+		glPushMatrix();
+		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
+		aladdin.draw();
+		glPopMatrix();
+	}
+	if (flagBack) {
+		//PLAYER
+		glPushMatrix();
+		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
+		glRotated(180, 0, 1, 0);
+		aladdin.draw();
+		glPopMatrix();
+	}
+	if (flagRight) {
+		//PLAYER
+		glPushMatrix();
+		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
+		glRotated(-90, 0, 1, 0);
+		aladdin.draw();
+		glPopMatrix();
+	}
+	if (flagLeft) {
+		//PLAYER
+		glPushMatrix();
+		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
+		glRotated(90, 0, 1, 0);
+		aladdin.draw();
+		glPopMatrix();
+	}
 	//sky box
 
 
@@ -479,7 +517,18 @@ void myDisplay(void)
 		}
 	}
 	else {
-
+		glPushMatrix();
+		glColor3f(0.2, 0.2, 0.2);
+		GLUquadricObj* qobj;
+		qobj = gluNewQuadric();
+		glTranslated(50, 0, 0);
+		glRotated(90, 1, 0, 1);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		gluQuadricTexture(qobj, true);
+		gluQuadricNormals(qobj, GL_SMOOTH);
+		gluSphere(qobj, 100, 100, 100);
+		gluDeleteQuadric(qobj);
+		glPopMatrix();
 
 	}
 	glutSwapBuffers();
@@ -490,7 +539,7 @@ void myDisplay(void)
 //=======================================================================
 
 void setCameraFollow() {
-	
+
 	float playerRotationAngle = aladdin.rotation;
 
 
@@ -510,11 +559,11 @@ void setCameraFollow() {
 
 	// Set Camera Target
 	Vector cameraCenter = aladdin.position;
-		
+
 
 	if (firstPersonModeOn) {
-		float cameraTargetX = std::sinf(DEG2RAD(playerRotationAngle)) * cameraDistanceFromPlayer*10;
-		float cameraTargetZ = std::cosf(DEG2RAD(playerRotationAngle)) * cameraDistanceFromPlayer*10;
+		float cameraTargetX = std::sinf(DEG2RAD(playerRotationAngle)) * cameraDistanceFromPlayer * 10;
+		float cameraTargetZ = std::cosf(DEG2RAD(playerRotationAngle)) * cameraDistanceFromPlayer * 10;
 
 		cameraCenter.x -= cameraTargetX;
 		cameraCenter.z -= cameraTargetZ;
@@ -522,7 +571,7 @@ void setCameraFollow() {
 
 	cameraCenter.y += 7;
 	camera.center = cameraCenter;
-	
+
 }
 
 //=======================================================================
@@ -535,13 +584,13 @@ bool checkCollitionObstacles() {
 		if (compareDistances(aladdin.position, enemySnakes[i].position) < 3.0)
 			std::cout << "d: " << q << std::endl;
 
-			return true;
+		return true;
 	}
 	for (int i = 0; i < rocks.size(); i++) {
 		if (compareDistances(aladdin.position, rocks[i].position) < 3.0)
 			std::cout << "f: " << q << std::endl;
 
-			return true;
+		return true;
 	}
 
 	return false;
@@ -595,10 +644,10 @@ void myTimer(int) {
 			if (!tooClose) {
 				break;
 			}
-		
+
 		}
 
-		GameObject newSnake = GameObject(newSnakePosition, 0, 0.03, 0.5, "models/snake/snake.3ds",true);
+		GameObject newSnake = GameObject(newSnakePosition, 0, 0.03, 0.5, "models/snake/snake.3ds", true);
 
 		enemySnakes.push_back(newSnake);
 	}
@@ -632,7 +681,7 @@ void myTimer(int) {
 
 		}
 
-		GameObject newRock = GameObject(newRockPosition, 0, 0.3, 0.5, "models/rock1/rock.3ds",true);
+		GameObject newRock = GameObject(newRockPosition, 0, 0.3, 0.5, "models/rock1/rock.3ds", true);
 
 		rocks.push_back(newRock);
 	}
@@ -671,12 +720,12 @@ void myTimer(int) {
 
 		}
 
-		GameObject newWater = GameObject(newWaterPosition, 0,0.09, 0.5, "models/bottle/bottle.3ds",true);
+		GameObject newWater = GameObject(newWaterPosition, 0, 0.09, 0.5, "models/bottle/bottle.3ds", true);
 
 		water.push_back(newWater);
 	}
 	aladdin.position.y += playerVerticalVelocity;
-	playerVerticalVelocity+= gravity ;
+	playerVerticalVelocity += gravity;
 	if (aladdin.position.y < 0) {
 		aladdin.position.y = 0;
 		playerVerticalVelocity = 0;
@@ -696,7 +745,7 @@ void myKeyboard(unsigned char button, int x, int y)
 	{
 	case 'w':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		
+
 		break;
 	case 'v':
 		q += 5;
@@ -707,50 +756,37 @@ void myKeyboard(unsigned char button, int x, int y)
 	case 'r':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
-
-	case 'k':
-		 nplayerZ = aladdin.position.z - 0.1;
-	
-		aladdin.setRotation(0);
-		aladdin.position.z -= 0.1;
-			break;
-		
 	case 'u':
-		 nplayerX = aladdin.position.x - 0.1;
-
-			// Move the player forward
-		
-				aladdin.position.x -= 0.1;
-				aladdin.setRotation ( 15);
-			
-		
+		flagFront = true;
+		flagBack = false;
+		flagRight = false;
+		flagLeft = false;
+		if (speZ >= -2.15)
+			speZ += 0.5;
 		break;
 	case 'j':
-		 nplayerX = aladdin.position.x + 0.1;
-
-		
-			
-				// Move the player backward
-				aladdin.position.x += 0.1;
-				aladdin.setRotation(-15);
-			
-		
+		flagFront = false;
+		flagBack = true;
+		flagRight = false;
+		flagLeft = false;
+		if (speZ <= 2.5)
+			speZ -= 0.5;
 		break;
-		//	case 'k':
-				// Rotate the player to the left
-
-				//playerZ -= 0.1;
-
-				//break;
+	case 'k':
+		flagFront = false;
+		flagBack = false;
+		flagRight = true;
+		flagLeft = false;
+		if (speX <= 1.55)
+			speX -= 0.5;
+		break;
 	case 'h':
-		nplayerZ = aladdin.position.z + 0.1;
-
-		// Rotate the player to the right
-	aladdin.setRotation(180);
-			
-	aladdin.position.z += 0.1;
-			
-		
+		flagFront = false;
+		flagBack = false;
+		flagRight = false;
+		flagLeft = true;
+		if (speX >= -2.75)
+			speX += 0.5;
 		break;
 
 	case 'x':
@@ -784,15 +820,15 @@ int temp = 0;
 void mySpecial(int key, int x, int y) {
 	float a = 1.0;
 	float rh = std::sqrtf(1.0 / 2.0);
-	const float xChange[] = {0.0,-rh,-1.0,-rh,0.0,rh,1.0,rh};
-	const float zChange[] = { 1.0,rh,0.0,-rh,-1.0,-rh,0.0,rh};
+	const float xChange[] = { 0.0,-rh,-1.0,-rh,0.0,rh,1.0,rh };
+	const float zChange[] = { 1.0,rh,0.0,-rh,-1.0,-rh,0.0,rh };
 
 	switch (key) {
 	case GLUT_KEY_UP:
 
 		aladdin.position.x += xChange[movementState];
 		aladdin.position.z += zChange[movementState];
-		if (checkCollitionObstacles()==true) {
+		if (checkCollitionObstacles() == true) {
 			std::cout << "q: " << q << std::endl;
 
 			//aladdin.position.x -= xChange[movementState];
@@ -813,7 +849,7 @@ void mySpecial(int key, int x, int y) {
 		aladdin.setRotation(aladdin.rotation + 45);
 		if (checkCollitionObstacles()) {
 			movementState = temp;
-			
+
 		}
 		checkCollitionCollectables();
 
@@ -832,8 +868,8 @@ void mySpecial(int key, int x, int y) {
 		break;
 
 	}
-	
-		
+
+
 
 
 }
@@ -851,7 +887,7 @@ void myMotion(int x, int y)
 	GLfloat light_position[] = { 0.0f, 10.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-	
+
 }
 
 //=======================================================================
@@ -909,7 +945,8 @@ void LoadAssets()
 		loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
 	}
 	else {
-
+		tex_ground.Load("Textures/caveground.bmp");
+		loadBMP(&tex, "Textures/caveground.bmp", true);
 
 	}
 }
