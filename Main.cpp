@@ -424,6 +424,21 @@ void RenderGround()
 
 	glColor3f(1, 1, 1);	// Set material back to white instead of grey used for the ground texture.
 }
+void LoadAssets()
+{
+	// Loading texture files
+	if (!endOne) {
+		tex_ground.Load("Textures/sand.bmp");
+		loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
+	}
+	else {
+		tex_ground.Load("Textures/caveground.bmp");
+		loadBMP(&tex, "Textures/caveground.bmp", true);
+
+	}
+}
+
+bool first = false;
 
 //=======================================================================
 // Display Function
@@ -441,63 +456,35 @@ void myDisplay(void)
 	RenderGround();
 	glPushMatrix();
 
+	glPushMatrix();
 
+	aladdin.draw();
+	glPopMatrix();
 	// Drawing the Game Objects
 	//aladdin.draw();
-	//glPopMatrix();
-	if (flagFront) {
-		//PLAYER
-		glPushMatrix();
-		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
-		aladdin.draw();
-		glPopMatrix();
-	}
-	if (flagBack) {
-		//PLAYER
-		glPushMatrix();
-		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
-		glRotated(180, 0, 1, 0);
-		aladdin.draw();
-		glPopMatrix();
-	}
-	if (flagRight) {
-		//PLAYER
-		glPushMatrix();
-		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
-		glRotated(-90, 0, 1, 0);
-		aladdin.draw();
-		glPopMatrix();
-	}
-	if (flagLeft) {
-		//PLAYER
-		glPushMatrix();
-		glTranslated(speX + 1.1, 0.0, speZ + 0.3);
-		glRotated(90, 0, 1, 0);
-		aladdin.draw();
-		glPopMatrix();
-	}
-	//sky box
+	
 
 
 	drawScore();
+	glPushMatrix();
+	GLUquadricObj* qobj;
+	qobj = gluNewQuadric();
+	glTranslated(50, 0, 0);
+	glRotated(90, 1, 0, 1);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	gluQuadricTexture(qobj, true);
+	gluQuadricNormals(qobj, GL_SMOOTH);
+	gluSphere(qobj, 100, 100, 100);
+	gluDeleteQuadric(qobj);
+	glPopMatrix();
+
+
 	if (!endOne) {
-		glPushMatrix();
-		GLUquadricObj* qobj;
-		qobj = gluNewQuadric();
-		glTranslated(50, 0, 0);
-		glRotated(90, 1, 0, 1);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		gluQuadricTexture(qobj, true);
-		gluQuadricNormals(qobj, GL_SMOOTH);
-		gluSphere(qobj, 100, 100, 100);
-		gluDeleteQuadric(qobj);
-		glPopMatrix();
+
 		glPushMatrix();
 
 		cave.draw();
 		glPopMatrix();
-
-
 
 		for (GameObject snake : enemySnakes) {
 
@@ -527,18 +514,10 @@ void myDisplay(void)
 		}
 	}
 	else {
-		glPushMatrix();
-		glColor3f(0.2, 0.2, 0.2);
-		GLUquadricObj* qobj;
-		qobj = gluNewQuadric();
-		glTranslated(50, 0, 0);
-		glRotated(90, 1, 0, 1);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		gluQuadricTexture(qobj, true);
-		gluQuadricNormals(qobj, GL_SMOOTH);
-		gluSphere(qobj, 100, 100, 100);
-		gluDeleteQuadric(qobj);
-		glPopMatrix();
+		if (!first) {
+			LoadAssets();
+			first = true;
+		}
 
 	}
 	glutSwapBuffers();
@@ -615,8 +594,15 @@ void checkCollitionCollectables() {
 	}
 
 }
+float p = 0.0;
 void checkEndOne() {
-	if (compareDistances(aladdin.position, cave.position) < aladdin.collisionRadius + cave.collisionRadius) { endOne = true; }
+	if (aladdin.position.x>28&& aladdin.position.x<35&& aladdin.position.z>28 && aladdin.position.z < 35) {
+
+	
+		std::cout << "reached " << compareDistances(aladdin.position, cave.position) << std::endl;
+
+
+		endOne = true; }
 
 
 }
@@ -625,13 +611,15 @@ void myTimer(int) {
 
 	setCameraFollow();
 	setupCamera();
+	checkEndOne();
+	std::cout << "ended " << endOne << std::endl;
 
-	// Add Enemy Snakes
+	std::cout << "Position X: " << aladdin.position.x << std::endl;
+	std::cout << "Position z: " << aladdin.position.z << std::endl;
+	std::cout << "Position cx: " << cave.position.x << std::endl;
+	std::cout << "Position cz: " << cave.position.x << std::endl;
 
-	//std::cout << "Position X: " << aladdin.position.x << std::endl;
-	//std::cout << "Position Z: " << aladdin.position.z << std::endl;
-
-
+	std::cout << "sist: " << compareDistances(aladdin.position, cave.position) << std::endl;
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
 		float newSnakeX;
 		float newSnakeZ;
@@ -766,41 +754,17 @@ void myKeyboard(unsigned char button, int x, int y)
 	case 'r':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
-	case 'u':
-		flagFront = true;
-		flagBack = false;
-		flagRight = false;
-		flagLeft = false;
-		if (speZ >= -2.15)
-			speZ += 0.5;
-		break;
-	case 'j':
-		flagFront = false;
-		flagBack = true;
-		flagRight = false;
-		flagLeft = false;
-		if (speZ <= 2.5)
-			speZ -= 0.5;
-		break;
-	case 'k':
-		flagFront = false;
-		flagBack = false;
-		flagRight = true;
-		flagLeft = false;
-		if (speX <= 1.55)
-			speX -= 0.5;
-		break;
-	case 'h':
-		flagFront = false;
-		flagBack = false;
-		flagRight = false;
-		flagLeft = true;
-		if (speX >= -2.75)
-			speX += 0.5;
-		break;
+	
 
 	case 'x':
 		jump();
+		break;
+
+	case 's':
+		p += 0.05;
+		break;
+	case 'm':
+		p -= 0.05;
 		break;
 	case 'f':
 		if (!firstPersonModeOn) {
@@ -888,6 +852,7 @@ void mySpecial(int key, int x, int y) {
 			aladdin.setRotation(aladdin.rotation + 180);
 		}
 		checkCollisionCollectables();
+	
 		break;
 
 	case GLUT_KEY_LEFT:
@@ -898,6 +863,8 @@ void mySpecial(int key, int x, int y) {
 			movementState = temp;
 		}
 		checkCollisionCollectables();
+
+
 		break;
 
 	case GLUT_KEY_RIGHT:
@@ -908,6 +875,8 @@ void mySpecial(int key, int x, int y) {
 			movementState = temp;
 		}
 		checkCollisionCollectables();
+	
+
 		break;
 	}
 }
@@ -975,19 +944,6 @@ void myReshape(int w, int h)
 //=======================================================================
 // Assets Loading Function
 //=======================================================================
-void LoadAssets()
-{
-	// Loading texture files
-	if (!endOne) {
-		tex_ground.Load("Textures/sand.bmp");
-		loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
-	}
-	else {
-		tex_ground.Load("Textures/caveground.bmp");
-		loadBMP(&tex, "Textures/caveground.bmp", true);
-
-	}
-}
 
 
 
