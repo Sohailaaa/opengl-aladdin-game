@@ -1,10 +1,10 @@
 ﻿  Main.cpp
 C:\Users\20109\Music\Graphics Project\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
 C:\Users\20109\Music\Graphics Project\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\Main.cpp(583,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(589,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\20109\Music\Graphics Project\Main.cpp(593,20): warning C4018: '<': signed/unsigned mismatch
 C:\Users\20109\Music\Graphics Project\Main.cpp(599,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(625,28): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(654,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(689,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\20109\Music\Graphics Project\Main.cpp(609,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\20109\Music\Graphics Project\Main.cpp(635,28): warning C4018: '<': signed/unsigned mismatch
+C:\Users\20109\Music\Graphics Project\Main.cpp(664,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\20109\Music\Graphics Project\Main.cpp(699,22): warning C4018: '<': signed/unsigned mismatch
   OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe

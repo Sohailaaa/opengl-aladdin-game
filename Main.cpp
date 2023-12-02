@@ -75,6 +75,15 @@ public:
 		return Vector(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
 	}
 };
+class Direction {
+public:
+	float x,  z;
+
+	Direction() {
+		
+	}
+
+};
 
 class GameObject {
 
@@ -87,6 +96,7 @@ public:
 	Model_3DS gameObjectModel;
 	bool displayed;
 	bool needsRotation;
+	Direction direction;
 	bool isCave = false;
 	GameObject() {
 	}
@@ -812,66 +822,94 @@ void myKeyboard(unsigned char button, int x, int y)
 	}
 
 }
+bool checkRotationCollision() {
+	// Implement your rotation collision logic here
+	// Return true if there is a collision, otherwise return false
+	return false;
+}
 
+bool checkCollisionObstacles() {
+	// Implement your collision logic with obstacles here
+	// Return true if there is a collision, otherwise return false
+	return false;
+}
+
+void checkCollisionCollectables() {
+	// Implement your logic for collecting items here
+}
 //=======================================================================
 // Special Function
 //=======================================================================
 int temp = 0;
+constexpr float PI = 3.14159265358979323846f;
+
+void updateDirection() {
+	// Update the direction vector based on the current rotation
+	aladdin.direction.x = std::cos(aladdin.rotation * PI / 180.0f);
+	aladdin.direction.z = std::sin(aladdin.rotation * PI / 180.0f);
+}
 void mySpecial(int key, int x, int y) {
 	float a = 1.0;
 	float rh = std::sqrtf(1.0 / 2.0);
-	const float xChange[] = { 0.0,-rh,-1.0,-rh,0.0,rh,1.0,rh };
-	const float zChange[] = { 1.0,rh,0.0,-rh,-1.0,-rh,0.0,rh };
+	const float xChange[] = { 0.0, -rh, -1.0, -rh, 0.0, rh, 1.0, rh };
+	const float zChange[] = { 1.0, rh, 0.0, -rh, -1.0, -rh, 0.0, rh };
+
+	float deltaX, deltaZ;  // Declare deltaX and deltaZ outside the switch statement
 
 	switch (key) {
 	case GLUT_KEY_UP:
+		// Calculate movement based on current rotation
+		deltaX = xChange[movementState];
+		deltaZ = zChange[movementState];
 
-		aladdin.position.x += xChange[movementState];
-		aladdin.position.z += zChange[movementState];
-		if (checkCollitionObstacles() == true) {
-			std::cout << "q: " << q << std::endl;
+		// Update player position
+		aladdin.position.x += deltaX;
+		aladdin.position.z += deltaZ;
 
-			//aladdin.position.x -= xChange[movementState];
-			//aladdin.position.z -= zChange[movementState];
+		// Check collision
+		if (checkCollisionObstacles()) {
+			// If collision, revert the position change
+			aladdin.position.x -= deltaX;
+			aladdin.position.z -= deltaZ;
 		}
-		checkCollitionCollectables();
+
+		// Check collectables
+		checkCollisionCollectables();
 		break;
+
 	case GLUT_KEY_DOWN:
+		// Reverse the direction
 		movementState = (movementState + 4) % 8;
 		aladdin.setRotation(aladdin.rotation - 180);
-		checkCollitionCollectables();
 
+		// Check collision after reversing direction
+		if (checkCollisionObstacles()) {
+			// If collision, revert the rotation change
+			aladdin.setRotation(aladdin.rotation + 180);
+		}
+		checkCollisionCollectables();
 		break;
 
 	case GLUT_KEY_LEFT:
 		temp = movementState;
 		movementState = (movementState - 1 + 8) % 8;
 		aladdin.setRotation(aladdin.rotation + 45);
-		if (checkCollitionObstacles()) {
+		if (checkCollisionObstacles()) {
 			movementState = temp;
-
 		}
-		checkCollitionCollectables();
-
+		checkCollisionCollectables();
 		break;
+
 	case GLUT_KEY_RIGHT:
 		temp = movementState;
-
 		movementState = (movementState + 1) % 8;
 		aladdin.setRotation(aladdin.rotation - 45);
-		if (checkCollitionObstacles()) {
+		if (checkCollisionObstacles()) {
 			movementState = temp;
-
 		}
-		checkCollitionCollectables();
-
+		checkCollisionCollectables();
 		break;
-
 	}
-
-
-
-
 }
 
 
