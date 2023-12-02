@@ -570,16 +570,19 @@ void setCameraFollow() {
 bool checkCollitionObstacles() {
 
 	for (int i = 0; i < enemySnakes.size(); i++) {
-		if (compareDistances(aladdin.position, enemySnakes[i].position) < 3.0)
-			std::cout << "d: " << q << std::endl;
+		if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius) {
+			std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
 
-		return true;
+			return true;
+		}
+	
 	}
 	for (int i = 0; i < rocks.size(); i++) {
-		if (compareDistances(aladdin.position, rocks[i].position) < 3.0)
+		if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius) {
 			std::cout << "f: " << q << std::endl;
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
@@ -612,14 +615,8 @@ void myTimer(int) {
 	setCameraFollow();
 	setupCamera();
 	checkEndOne();
-	std::cout << "ended " << endOne << std::endl;
 
-	std::cout << "Position X: " << aladdin.position.x << std::endl;
-	std::cout << "Position z: " << aladdin.position.z << std::endl;
-	std::cout << "Position cx: " << cave.position.x << std::endl;
-	std::cout << "Position cz: " << cave.position.x << std::endl;
 
-	std::cout << "sist: " << compareDistances(aladdin.position, cave.position) << std::endl;
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
 		float newSnakeX;
 		float newSnakeZ;
@@ -831,7 +828,8 @@ void mySpecial(int key, int x, int y) {
 		aladdin.position.z += deltaZ;
 
 		// Check collision
-		if (checkCollisionObstacles()) {
+		if (checkCollitionObstacles()==1) {
+
 			// If collision, revert the position change
 			aladdin.position.x -= deltaX;
 			aladdin.position.z -= deltaZ;
@@ -847,7 +845,7 @@ void mySpecial(int key, int x, int y) {
 		aladdin.setRotation(aladdin.rotation - 180);
 
 		// Check collision after reversing direction
-		if (checkCollisionObstacles()) {
+		if (checkCollitionObstacles()==1) {
 			// If collision, revert the rotation change
 			aladdin.setRotation(aladdin.rotation + 180);
 		}
@@ -859,7 +857,7 @@ void mySpecial(int key, int x, int y) {
 		temp = movementState;
 		movementState = (movementState - 1 + 8) % 8;
 		aladdin.setRotation(aladdin.rotation + 45);
-		if (checkCollisionObstacles()) {
+		if (checkCollitionObstacles()==1) {
 			movementState = temp;
 		}
 		checkCollisionCollectables();
@@ -871,7 +869,7 @@ void mySpecial(int key, int x, int y) {
 		temp = movementState;
 		movementState = (movementState + 1) % 8;
 		aladdin.setRotation(aladdin.rotation - 45);
-		if (checkCollisionObstacles()) {
+		if (checkCollitionObstacles()==1) {
 			movementState = temp;
 		}
 		checkCollisionCollectables();
