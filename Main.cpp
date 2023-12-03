@@ -816,9 +816,7 @@ void myKeyboard(unsigned char button, int x, int y)
 		break;
 	
 
-	case 'x':
-		jump();
-		break;
+
 
 	case 's':
 		p += 0.05;
@@ -969,7 +967,7 @@ void myMouse(int button, int state, int x, int y)
 	}
 	if (state == GLUT_UP)
 	{
-
+		jump();
 	}
 }
 
