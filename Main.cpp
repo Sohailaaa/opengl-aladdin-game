@@ -282,8 +282,11 @@ GameObject aladdin;
 GameObject cave;
 
 GameObject diamond1;
+bool tookd1 = false;
 GameObject diamond2;
+bool tookd2 = false;
 GameObject diamond3;
+bool tookd3 = false;
 
 GameObject ghost1;
 GameObject ghost2;
@@ -293,6 +296,7 @@ GameObject rock1;
 GameObject rock2;
 
 GameObject treasureBox;
+bool tookt = false;
 
 // Textures
 GLTexture tex_ground;
@@ -587,18 +591,21 @@ void myDisplay(void)
 
 	if (endOne) {
 
-		glPushMatrix();
-		diamond1.draw();
-		glPopMatrix();
-
-		glPushMatrix();
-		diamond2.draw();
-		glPopMatrix();
-
-		glPushMatrix();
-		diamond3.draw();
-		glPopMatrix();
-
+		if ( tookd1==false) {
+			glPushMatrix();
+			diamond1.draw();
+			glPopMatrix();
+		}
+		if (tookd2 == false) {
+			glPushMatrix();
+			diamond2.draw();
+			glPopMatrix();
+		}
+		if (tookd3 == false) {
+			glPushMatrix();
+			diamond3.draw();
+			glPopMatrix();
+		}
 		glPushMatrix();
 		ghost1.draw();
 		glPopMatrix();
@@ -619,12 +626,12 @@ void myDisplay(void)
 		rock2.draw();
 		glPopMatrix();
 
+		if (tookt == false) {
+			glPushMatrix();
+			treasureBox.draw();
+			glPopMatrix();
 
-		glPushMatrix();
-		treasureBox.draw();
-		glPopMatrix();
-
-
+		}
 
 	}
 	glutSwapBuffers();
@@ -675,25 +682,25 @@ void setCameraFollow() {
 //=======================================================================
 
 bool checkCollitionObstacles() {
+	if (!endOne) {
+		for (int i = 0; i < enemySnakes.size(); i++) {
+			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius + 2.0) {
+				std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
+				audioManager.Play("collision.wav", 0.5f, false);
 
-	for (int i = 0; i < enemySnakes.size(); i++) {
-		if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius+2.0) {
-			std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
-			audioManager.Play("collision.wav", 0.5f, false);
+				return true;
+			}
 
-			return true;
 		}
-	
-	}
-	for (int i = 0; i < rocks.size(); i++) {
-		if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius+2.0) {
-			std::cout << "f: " << q << std::endl;
-			audioManager.Play("collision.wav", 0.5f, false);
+		for (int i = 0; i < rocks.size(); i++) {
+			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius + 2.0) {
+				std::cout << "f: " << q << std::endl;
+				audioManager.Play("collision.wav", 0.5f, false);
 
-			return true;
+				return true;
+			}
 		}
 	}
-
 	return false;
 }
 bool took = false;
@@ -930,22 +937,79 @@ bool checkRotationCollision() {
 }
 
 bool checkCollisionObstacles() {
-	// Implement your collision logic with obstacles here
-	// Return true if there is a collision, otherwise return false
+	if ((aladdin.position.x <= 12 && aladdin.position.x >= 8) && aladdin.position.y == 0 && (aladdin.position.z <= 21 && aladdin.position.z >= 18)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
+	if ((aladdin.position.x <= -12 && aladdin.position.x >=- 8) && aladdin.position.y == 0 && (aladdin.position.z <= -42 && aladdin.position.z >= -38)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
+	if ((aladdin.position.x <= 12 && aladdin.position.x >= 8) && aladdin.position.y == 0 && (aladdin.position.z <=42  && aladdin.position.z >= 38)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
+	if ((aladdin.position.x <= 47 && aladdin.position.x >= 43) && aladdin.position.y == 0 && (aladdin.position.z <= 42 && aladdin.position.z >= 38)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
+	if ((aladdin.position.x <= -22 && aladdin.position.x >= -18) && aladdin.position.y == 0 && (aladdin.position.z <= -22 && aladdin.position.z >= -18)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
+
 	return false;
 }
 
-bool tookd1 = false;
+
 void checkCollisionCollectables() {
-	if ((aladdin.position.x <= 21 && aladdin.position.x >= 18) && aladdin.position.y == 0 && (aladdin.position.z <= 21 && aladdin.position.z >= 18)) {
-		if (!tookd1) {
+	if ((aladdin.position.x <= 23 && aladdin.position.x >= 16) && aladdin.position.y == 0 && (aladdin.position.z <= 24 && aladdin.position.z >= 16)) {
+		if (!tookd1 ) {
 			audioManager.Play("whoosh.wav", 0.5f, false);
-			diamond1.setDisapear();
+			diamond1.displayed=false;
 			score += 1;
 			tookd1 = true;
 		}
-	}
 
+	}
+	if ((aladdin.position.x <= -26 && aladdin.position.x >= -34) && aladdin.position.y == 0 && (aladdin.position.z <=34  && aladdin.position.z >= 26)) {
+		if (!tookd2) {
+			audioManager.Play("whoosh.wav", 0.5f, false);
+			diamond2.displayed = false;
+			score += 1;
+			tookd2 = true;
+		}
+
+	}
+	if ((aladdin.position.x <= 7 && aladdin.position.x >= 3) && aladdin.position.y == 0 && (aladdin.position.z <= 32 && aladdin.position.z >= 28)) {
+		if (!tookd3) {
+			audioManager.Play("whoosh.wav", 0.5f, false);
+			diamond3.displayed = false;
+			score += 1;
+			tookd3 = true;
+		}
+	}
+		if ((aladdin.position.x <= 22 && aladdin.position.x >=18) && aladdin.position.y == 0 && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
+			if (!tookt) {
+				audioManager.Play("whoosh.wav", 0.5f, false);
+				treasureBox.displayed = false;
+				tookt = true;
+			}
+	}
+	
+
+	//glutPostRedisplay();
+	
 }
 
 //=======================================================================
@@ -969,8 +1033,7 @@ void mySpecial(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_UP:
-		std::cout << "aladdin x: " << aladdin.position.x << std::endl;
-		std::cout << "aladdin z: " << aladdin.position.z << std::endl;
+		
 		// Calculate movement based on current rotation
 		deltaX = xChange[movementState];
 		deltaZ = zChange[movementState];
@@ -979,15 +1042,20 @@ void mySpecial(int key, int x, int y) {
 		aladdin.position.x += deltaX;
 		aladdin.position.z += deltaZ;
 
+		std::cout << "aladdin x: " << aladdin.position.x << std::endl;
+		std::cout << "aladdin z: " << aladdin.position.z << std::endl;
 		// Check collision
-		if (checkCollitionObstacles()==1) {
+		if (checkCollitionObstacles()==1 && (!endOne)) {
 
 			// If collision, revert the position change
 			aladdin.position.x -= deltaX;
 			aladdin.position.z -= deltaZ;
 		}
 
-
+		if (checkCollisionObstacles() == 1 && (endOne)) {
+			aladdin.position.x -= (deltaX + 1.5);
+			aladdin.position.z -= (deltaZ + 1.5);
+		}
 		// Check collectables
 		if (endOne) {
 			checkCollisionCollectables();
@@ -1115,6 +1183,7 @@ void main(int argc, char** argv)
 	glutInitWindowSize(WIDTH, HEIGHT);
 	glutInitWindowPosition(100, 150);
 	glutCreateWindow(title);
+	audioManager.Play("arabianNights.wav", 0.3f, false);
 	glutDisplayFunc(myDisplay);
 	glutTimerFunc(0, myTimer, 0);
 	glutKeyboardFunc(myKeyboard);
