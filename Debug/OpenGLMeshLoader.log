@@ -1,10 +1,1 @@
-﻿  Main.cpp
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\Main.cpp(572,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(580,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(591,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(620,28): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(649,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(684,22): warning C4018: '<': signed/unsigned mismatch
-  OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe
+﻿  OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe

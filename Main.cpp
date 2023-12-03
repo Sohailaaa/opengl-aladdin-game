@@ -6,17 +6,24 @@
 #include "Model_3DS.h"
 #include "GLTexture.h"
 #include <glut.h>
+#include "audio.h"
+
+#include <time.h>
+
 #include <iostream>
 #include <math.h>
 #include <vector>
 #include <chrono>
 #include <random>
+constexpr char* audioPath = "C:\\sound";
 
 
 
 //=======================================================================
 // Constants
 //=======================================================================
+Audio audioManager;
+
 float q = 0;
 #define DEG2RAD(a) (a * 0.0174532925)
 const float gravity = -0.3;
@@ -33,7 +40,7 @@ GLdouble aspectRatio = (GLdouble)WIDTH / (GLdouble)HEIGHT;
 GLdouble zNear = 0.1;
 GLdouble zFar = 100000;
 
-int MAX_NUMBER_OF_ENEMIES = 4;
+int MAX_NUMBER_OF_ENEMIES = 5;
 float MIN_ENEMY_CLOSENESS = 5; // No Two Enemies will be closer than this value;
 
 
@@ -94,7 +101,7 @@ public:
 	float scale;
 	float collisionRadius;
 	Model_3DS gameObjectModel;
-	bool displayed;
+	bool displayed=true;
 	bool needsRotation;
 	Direction direction;
 	bool isCave = false;
@@ -107,7 +114,7 @@ public:
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
-		this->displayed = true;
+	
 		this->needsRotation = needsRotation;
 
 		this->collisionRadius = collisionRadius;
@@ -135,29 +142,31 @@ public:
 	}
 
 	void draw() {
-		glPushMatrix();
-		glTranslatef(position.x, position.y, position.z);
-		glRotatef(rotation, 0, 1, 0);
-		glScalef(scale, scale, scale);
-		if (needsRotation) {
+		if (this->displayed==true) {
 			glPushMatrix();
-			glRotatef(90, 1, 0, 0);
+			glTranslatef(position.x, position.y, position.z);
+			glRotatef(rotation, 0, 1, 0);
+			glScalef(scale, scale, scale);
+			if (needsRotation) {
+				glPushMatrix();
+				glRotatef(90, 1, 0, 0);
 
-		}
+			}
 
 
-		if (isCave) {
-			glPushMatrix();
-			glTranslatef(1375, 1455, 0);
-			glRotatef(135, 0, 0, 1);
+			if (isCave) {
+				glPushMatrix();
+				glTranslatef(1375, 1455, 0);
+				glRotatef(135, 0, 0, 1);
 
 
-		}
-		gameObjectModel.Draw();
-		if (needsRotation) {
+			}
+			gameObjectModel.Draw();
+			if (needsRotation) {
+				glPopMatrix();
+			}
 			glPopMatrix();
 		}
-		glPopMatrix();
 	}
 
 };
@@ -218,11 +227,31 @@ public:
 int score = 0;
 
 void drawScore() {
+	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, glutGet(GLUT_WINDOW_WIDTH), 0, glutGet(GLUT_WINDOW_HEIGHT));
 
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
-	// Position the score text at the top-left corner of the window
-	glRasterPos3f(0.0, 0.92, 0.0);
+	// Define 3D position for the score (you can adjust these values)
+	GLfloat scorePosition[3] = { 0.0f, 14.0f, 0.0f };
+
+	// Convert 3D world position to screen coordinates
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLint viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	GLdouble winX, winY, winZ;
+	gluProject(scorePosition[0], scorePosition[1], scorePosition[2], modelview, projection, viewport, &winX, &winY, &winZ);
+
+	// Set the raster position in window coordinates
+	glRasterPos2d(winX, glutGet(GLUT_WINDOW_HEIGHT) - winY);
 
 	char scoreText[50];
 	snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
@@ -230,8 +259,14 @@ void drawScore() {
 	for (int i = 0; scoreText[i] != '\0'; i++) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, scoreText[i]);
 	}
+
 	glPopMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 }
+
 //=======================================================================
 // Variables
 //=======================================================================
@@ -390,8 +425,14 @@ void myInit(void)
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
+}bool checkCaveCollision(Vector pos) {
+	// Implement your rotation collision logic here
+	// Return true if there is a collision, otherwise return false
+if (pos.x > 28 && pos.x < 35 && pos.z > 28 && pos.z < 34) {
+		return true;
+	}
+	return false;
 }
-
 //=======================================================================
 // Render Ground Function
 //=======================================================================
@@ -447,10 +488,13 @@ void myDisplay(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+
 	GLfloat lightIntensity[] = { 0.7, 0.7, 0.7, 1.0f };
 	GLfloat lightPosition[] = { 0.0f, 100.0f, 0.0f, 0.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightIntensity);
+
 
 	// Draw Ground
 	RenderGround();
@@ -495,14 +539,14 @@ void myDisplay(void)
 		}
 
 		for (GameObject wateri : water) {
-			if (wateri.displayed) {
+			
 				glPushMatrix();
-				glTranslatef(0.0, 1.1, 0.0);
+				
 
-
+				glTranslatef(0, 1, 0);
 				wateri.draw();
 				glPopMatrix();
-			}
+			
 		}
 
 		for (GameObject rock : rocks) {
@@ -570,16 +614,18 @@ void setCameraFollow() {
 bool checkCollitionObstacles() {
 
 	for (int i = 0; i < enemySnakes.size(); i++) {
-		if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius) {
+		if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius+2.0) {
 			std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
+			audioManager.Play("collision.wav", 0.5f, false);
 
 			return true;
 		}
 	
 	}
 	for (int i = 0; i < rocks.size(); i++) {
-		if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius) {
+		if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius+2.0) {
 			std::cout << "f: " << q << std::endl;
+			audioManager.Play("collision.wav", 0.5f, false);
 
 			return true;
 		}
@@ -587,21 +633,32 @@ bool checkCollitionObstacles() {
 
 	return false;
 }
+bool took = false;
 void checkCollitionCollectables() {
 	for (int i = 0; i < water.size(); i++) {
-		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius) {
+		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius-0.252) {
+			if (!took) {
+				std::cout << "dist: " << compareDistances(aladdin.position, water[i].position) << std::endl;
+				audioManager.Play("whoosh.wav", 0.5f, false);
 
-			water[i].setDisapear();
-			score++;
-		}
+				water[i].setDisapear();
+				score += 1;
+				took = true;
+			}
+		}took = false;
+		std::cout << "dist: " << compareDistances(aladdin.position, water[i].position) << std::endl;
+
 	}
 
 }
 float p = 0.0;
+bool first2 = true;
 void checkEndOne() {
-	if (aladdin.position.x>28&& aladdin.position.x<35&& aladdin.position.z>28 && aladdin.position.z < 35) {
-
-	
+	if (aladdin.position.x>28&& aladdin.position.x<35&& aladdin.position.z>28 && aladdin.position.z < 34) {
+		if (first2) {
+			audioManager.Play("target.wav", 0.5f, false);
+			first2 = false;
+		}
 		std::cout << "reached " << compareDistances(aladdin.position, cave.position) << std::endl;
 
 
@@ -630,9 +687,11 @@ void myTimer(int) {
 			newSnakeX = getRandomInt(-58, 58);
 			newSnakeZ = getRandomInt(-58, 58);
 			newSnakePosition = { newSnakeX,0,newSnakeZ };
-
+			if(checkCaveCollision(newSnakePosition)){
+				tooClose = true;
+			}
 			for (GameObject otherSnake : enemySnakes) {
-				if (compareDistances(otherSnake.position, newSnakePosition) < MIN_ENEMY_CLOSENESS)
+				if (compareDistances(otherSnake.position, newSnakePosition) < MIN_ENEMY_CLOSENESS )
 					tooClose = true;
 			}
 
@@ -659,7 +718,9 @@ void myTimer(int) {
 			newRockX = getRandomInt(-58, 58);
 			newRockZ = getRandomInt(-58, 58);
 			newRockPosition = { newRockX,0,newRockZ };
-
+			if (checkCaveCollision(newRockPosition)) {
+				tooClose = true;
+			}
 			for (GameObject otherSnake : enemySnakes) {
 				if (compareDistances(otherSnake.position, newRockPosition) < MIN_ENEMY_CLOSENESS)
 					tooClose = true;
@@ -694,7 +755,9 @@ void myTimer(int) {
 			newWaterX = getRandomInt(-58, 58);
 			newWaterZ = getRandomInt(-58, 58);
 			newWaterPosition = { newWaterX,0,newWaterZ };
-
+			if (checkCaveCollision(newWaterPosition)) {
+				tooClose = true;
+			}
 			for (GameObject otherSnake : enemySnakes) {
 				if (compareDistances(otherSnake.position, newWaterPosition) < MIN_ENEMY_CLOSENESS)
 					tooClose = true;
@@ -836,7 +899,8 @@ void mySpecial(int key, int x, int y) {
 		}
 
 		// Check collectables
-		checkCollisionCollectables();
+		checkCollitionCollectables();
+		audioManager.Play("step.wav", 0.03f, false);
 		break;
 
 	case GLUT_KEY_DOWN:
@@ -849,8 +913,7 @@ void mySpecial(int key, int x, int y) {
 			// If collision, revert the rotation change
 			aladdin.setRotation(aladdin.rotation + 180);
 		}
-		checkCollisionCollectables();
-	
+		
 		break;
 
 	case GLUT_KEY_LEFT:
@@ -860,7 +923,6 @@ void mySpecial(int key, int x, int y) {
 		if (checkCollitionObstacles()==1) {
 			movementState = temp;
 		}
-		checkCollisionCollectables();
 
 
 		break;
@@ -872,7 +934,6 @@ void mySpecial(int key, int x, int y) {
 		if (checkCollitionObstacles()==1) {
 			movementState = temp;
 		}
-		checkCollisionCollectables();
 	
 
 		break;
@@ -952,6 +1013,7 @@ void myReshape(int w, int h)
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
+	audioManager.BasePath = audioPath;
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(WIDTH, HEIGHT);
@@ -961,12 +1023,11 @@ void main(int argc, char** argv)
 	glutTimerFunc(0, myTimer, 0);
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecial);
-	// glutMotionFunc(myMotion);
-	// glutMouseFunc(myMouse);
-	// glutReshapeFunc(myReshape);
+	glutMotionFunc(myMotion);
+	 glutMouseFunc(myMouse);
+	glutReshapeFunc(myReshape);
 
 	myInit();
-
 	LoadAssets();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);

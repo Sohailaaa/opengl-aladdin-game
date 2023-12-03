@@ -24,6 +24,9 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLTexture.h">
@@ -31,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="Model_3DS.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

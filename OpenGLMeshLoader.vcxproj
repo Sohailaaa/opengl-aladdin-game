@@ -83,11 +83,13 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="audio.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="Model_3DS.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audio.h" />
     <ClInclude Include="GLTexture.h" />
     <ClInclude Include="Model_3DS.h" />
   </ItemGroup>
