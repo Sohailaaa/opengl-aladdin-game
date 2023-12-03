@@ -281,8 +281,18 @@ float cameraHeightAbovePlayer = 10.0f;
 GameObject aladdin;
 GameObject cave;
 
-GameObject snake;
-GameObject bottle;
+GameObject diamond1;
+GameObject diamond2;
+GameObject diamond3;
+
+GameObject ghost1;
+GameObject ghost2;
+GameObject ghost3;
+
+GameObject rock1;
+GameObject rock2;
+
+GameObject treasureBox;
 
 // Textures
 GLTexture tex_ground;
@@ -425,7 +435,8 @@ void myInit(void)
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-}bool checkCaveCollision(Vector pos) {
+}
+bool checkCaveCollision(Vector pos) {
 	// Implement your rotation collision logic here
 	// Return true if there is a collision, otherwise return false
 if (pos.x > 28 && pos.x < 35 && pos.z > 28 && pos.z < 34) {
@@ -440,7 +451,11 @@ void RenderGround()
 {
 	glDisable(GL_LIGHTING);	// Disable lighting 
 
-	glColor3f(0.2, 0.2, 0.2);	// Dim the ground texture a bit
+	if (endOne) {
+		glColor3f(0.2, 0.2, 0.2);
+	}
+	else
+		glColor3f(0.6, 0.6, 0.6);	// Dim the ground texture a bit
 
 	glEnable(GL_TEXTURE_2D);	// Enable 2D texturing
 
@@ -511,6 +526,11 @@ void myDisplay(void)
 
 	drawScore();
 	glPushMatrix();
+	if (endOne) {
+		glColor3f(0.4, 0.4, 0.4);
+	}
+	else
+		glColor3f(0.6,0.6,0.6);
 	GLUquadricObj* qobj;
 	qobj = gluNewQuadric();
 	glTranslated(50, 0, 0);
@@ -562,6 +582,49 @@ void myDisplay(void)
 			LoadAssets();
 			first = true;
 		}
+
+	}
+
+	if (endOne) {
+
+		glPushMatrix();
+		diamond1.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		diamond2.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		diamond3.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		ghost1.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		ghost2.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		ghost3.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		rock1.draw();
+		glPopMatrix();
+
+		glPushMatrix();
+		rock2.draw();
+		glPopMatrix();
+
+
+		glPushMatrix();
+		treasureBox.draw();
+		glPopMatrix();
+
+
 
 	}
 	glutSwapBuffers();
@@ -788,8 +851,24 @@ void myTimer(int) {
 		aladdin.position.y = 0;
 		playerVerticalVelocity = 0;
 	}
+
+	diamond1 = GameObject({ 20,0,20 }, 0, 0.5, 0.5, "models/diamond/diamond.3ds", true);
+	diamond2 = GameObject({ -30, 0, 30 }, 0, 0.5, 0.5, "models/diamond/diamond.3ds", true);
+	diamond3 = GameObject({ 5, 0, 30 }, 0, 0.5, 0.5, "models/diamond/diamond.3ds", true);
+
+	ghost1 = GameObject({ 10,0,40 }, 0, 4, 0.5, "models/ghost/ghost.3ds", true);
+	ghost2 = GameObject({ -20, 0, -20 }, 0, 4, 0.5, "models/ghost/ghost.3ds", true);
+	ghost3 = GameObject({ 45, 0, 40 }, 0, 4, 0.5, "models/ghost/ghost.3ds", true);
+
+	rock1 = GameObject({ 10,3,20 }, 0, 40, 0.5, "models/rock2/rock.3ds", true);
+	rock2 = GameObject({ -10, 3, -40 }, 0, 40, 0.5, "models/rock2/rock.3ds", true);
+
+	treasureBox= GameObject({ 20, 0, -50 }, 0, 0.09, 0.5, "models/treasure/treasure.3ds", true);
+
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, myTimer, 0);
+
+
 
 }
 float nplayerX = 0.0;
@@ -856,9 +935,19 @@ bool checkCollisionObstacles() {
 	return false;
 }
 
+bool tookd1 = false;
 void checkCollisionCollectables() {
-	// Implement your logic for collecting items here
+	if ((aladdin.position.x <= 21 && aladdin.position.x >= 18) && aladdin.position.y == 0 && (aladdin.position.z <= 21 && aladdin.position.z >= 18)) {
+		if (!tookd1) {
+			audioManager.Play("whoosh.wav", 0.5f, false);
+			diamond1.setDisapear();
+			score += 1;
+			tookd1 = true;
+		}
+	}
+
 }
+
 //=======================================================================
 // Special Function
 //=======================================================================
@@ -880,6 +969,8 @@ void mySpecial(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_UP:
+		std::cout << "aladdin x: " << aladdin.position.x << std::endl;
+		std::cout << "aladdin z: " << aladdin.position.z << std::endl;
 		// Calculate movement based on current rotation
 		deltaX = xChange[movementState];
 		deltaZ = zChange[movementState];
@@ -896,9 +987,16 @@ void mySpecial(int key, int x, int y) {
 			aladdin.position.z -= deltaZ;
 		}
 
+
 		// Check collectables
-		checkCollitionCollectables();
+		if (endOne) {
+			checkCollisionCollectables();
+		}
+		else {
+			checkCollitionCollectables();
+		}
 		audioManager.Play("step.wav", 0.03f, false);
+
 		break;
 
 	case GLUT_KEY_DOWN:

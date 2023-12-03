@@ -1,10 +1,10 @@
 ﻿  Main.cpp
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\20109\Music\Graphics Project\Main.cpp(616,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(625,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(638,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(677,28): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(708,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\20109\Music\Graphics Project\Main.cpp(745,22): warning C4018: '<': signed/unsigned mismatch
-  OpenGLMeshLoader.vcxproj -> C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(679,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(688,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(701,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(740,28): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(771,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(808,22): warning C4018: '<': signed/unsigned mismatch
+  OpenGLMeshLoader.vcxproj -> C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe
