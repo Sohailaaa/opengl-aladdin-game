@@ -1,10 +1,10 @@
 ﻿  Main.cpp
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(686,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(695,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(708,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(747,28): warning C4018: '<': signed/unsigned mismatch
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(778,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Main.cpp(815,22): warning C4018: '<': signed/unsigned mismatch
-  OpenGLMeshLoader.vcxproj -> C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe
+C:\Users\nadak\source\repos\opengl-aladdin-game\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\nadak\source\repos\opengl-aladdin-game\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(757,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(766,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(779,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(818,28): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(849,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(886,22): warning C4018: '<': signed/unsigned mismatch
+  OpenGLMeshLoader.vcxproj -> C:\Users\nadak\Source\Repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe

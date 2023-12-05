@@ -298,6 +298,9 @@ GameObject rock2;
 GameObject treasureBox;
 bool tookt = false;
 
+bool flagFinish = false;
+int timer = 50;
+
 // Textures
 GLTexture tex_ground;
 
@@ -363,14 +366,7 @@ void setupCamera() {
 //=======================================================================
 void InitLightSource()
 {
-	// Enable Lighting for this OpenGL Program
-	glEnable(GL_LIGHTING);
-
-	// Enable Light Source number 0
-	// OpengL has 8 light sources
-	glEnable(GL_LIGHT0);
-
-	// Define Light source 0 ambient light
+	// LIGHT0
 	GLfloat ambient[] = { 0.1f, 0.1f, 0.1, 1.0f };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
@@ -384,7 +380,23 @@ void InitLightSource()
 
 	// Finally, define light source 0 position in World Space
 	GLfloat light_position[] = { 0.0f, 10.0f, 0.0f, 1.0f };
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position); 
+
+	// LIGHT1
+	GLfloat ambient1[] = { 0.1f, 0.1f, 0.1, 1.0f };
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
+
+	// Define Light source 0 diffuse light
+	GLfloat diffuse1[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
+
+	// Define Light source 0 Specular light
+	GLfloat specular1[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specular1);
+
+	// Finally, define light source 0 position in World Space
+	GLfloat light_position1[] = { 0.0f, 10.0f, 0.0f, 1.0f };
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 }
 
 //=======================================================================
@@ -503,16 +515,33 @@ bool first = false;
 //=======================================================================
 // Display Function
 //=======================================================================
+void renderText(const char* text, float x, float y, float scale) {
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(x, y, 0.0f);
+	glScalef(scale, scale, 1.0f);
+
+	// Loop through each character in the text
+	for (const char* c = text; *c != '\0'; c++) {
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, *c);
+	}
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
 void myDisplay(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-	GLfloat lightIntensity[] = { 0.7, 0.7, 0.7, 1.0f };
-	GLfloat lightPosition[] = { 0.0f, 100.0f, 0.0f, 0.0f };
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightIntensity);
 
 
 	// Draw Ground
@@ -548,7 +577,19 @@ void myDisplay(void)
 
 
 	if (!endOne) {
+		glDisable(GL_LIGHT1);
+		glEnable(GL_LIGHT0);
+		if (timer % 3 == 0) {
+			GLfloat lightPosition[] = { 15.0f, 9.0f, 0.0f, 0.0f };
+			glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+		}
+		else {
+			GLfloat lightPosition[] = { 0.0f, 9.0f, 15.0f, 0.0f };
+			glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+		}
 
+		GLfloat lightIntensity[] = { 0.7, 0.7, 0.7, 1.0f };
+		glLightfv(GL_LIGHT0, GL_AMBIENT, lightIntensity);
 		glPushMatrix();
 
 		cave.draw();
@@ -590,7 +631,13 @@ void myDisplay(void)
 	}
 
 	if (endOne) {
-
+		glDisable(GL_LIGHT0);
+		glEnable(GL_LIGHT1);
+		GLfloat lightPosition1[] = { 0.0f, 9.0f, 15.0f, 0.0f };
+		glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+		GLfloat lightIntensity1[] = { 0.3, 0.3 ,0.3, 1.0f };
+		glLightfv(GL_LIGHT1, GL_AMBIENT, lightIntensity1);
+			
 		if ( tookd1==false) {
 			glPushMatrix();
 			diamond1.draw();
@@ -634,8 +681,26 @@ void myDisplay(void)
 		}
 
 	}
+		if (flagFinish) {
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			glColor3f(0, 1, 0);
+			renderText("YOU WON :D ", 200.0f, 200.0f, 0.5f);
+
+			glFlush();
+		}
+		else if(score < 0 || timer < 0)	{
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			glColor3f(1, 0, 0);
+			renderText("YOU LOST :( ", 200.0f, 200.0f, 0.5f);
+
+			glFlush();
+		}
+
 	glutSwapBuffers();
 }
+
 
 //=======================================================================
 // Camera Position Function
@@ -681,13 +746,19 @@ void setCameraFollow() {
 // Timer Function
 //=======================================================================
 
+void clk(int a) {
+	timer -= 1;
+	glutTimerFunc(1 * 1000, clk, 0);
+	glutPostRedisplay();
+}
+
 bool checkCollitionObstacles() {
 	if (!endOne) {
 		for (int i = 0; i < enemySnakes.size(); i++) {
 			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius + 2.0) {
 				std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
-				audioManager.Play("collision.wav", 0.5f, false);
-
+				audioManager.Play("snake.wav", 0.5f, false);
+				score -= 1;
 				return true;
 			}
 
@@ -696,7 +767,7 @@ bool checkCollitionObstacles() {
 			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius + 2.0) {
 				std::cout << "f: " << q << std::endl;
 				audioManager.Play("collision.wav", 0.5f, false);
-
+				score -= 1;
 				return true;
 			}
 		}
@@ -726,7 +797,7 @@ bool first2 = true;
 void checkEndOne() {
 	if (aladdin.position.x>28&& aladdin.position.x<35&& aladdin.position.z>28 && aladdin.position.z < 34) {
 		if (first2) {
-			audioManager.Play("target.wav", 0.5f, false);
+			audioManager.Play("monsterRoar.wav", 0.5f, false);
 			first2 = false;
 		}
 		std::cout << "reached " << compareDistances(aladdin.position, cave.position) << std::endl;
@@ -754,8 +825,8 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newSnakeX = getRandomInt(-58, 58);
-			newSnakeZ = getRandomInt(-58, 58);
+			newSnakeX = getRandomInt(-48, 48);
+			newSnakeZ = getRandomInt(-48, 48);
 			newSnakePosition = { newSnakeX,0,newSnakeZ };
 			if(checkCaveCollision(newSnakePosition)){
 				tooClose = true;
@@ -785,8 +856,8 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newRockX = getRandomInt(-58, 58);
-			newRockZ = getRandomInt(-58, 58);
+			newRockX = getRandomInt(-48, 48);
+			newRockZ = getRandomInt(-48, 48);
 			newRockPosition = { newRockX,0,newRockZ };
 			if (checkCaveCollision(newRockPosition)) {
 				tooClose = true;
@@ -822,8 +893,8 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newWaterX = getRandomInt(-58, 58);
-			newWaterZ = getRandomInt(-58, 58);
+			newWaterX = getRandomInt(-48, 48);
+			newWaterZ = getRandomInt(-48, 48);
 			newWaterPosition = { newWaterX,0,newWaterZ };
 			if (checkCaveCollision(newWaterPosition)) {
 				tooClose = true;
@@ -1004,6 +1075,7 @@ void checkCollisionCollectables() {
 				audioManager.Play("whoosh.wav", 0.5f, false);
 				treasureBox.displayed = false;
 				tookt = true;
+				flagFinish = true;
 			}
 	}
 	
@@ -1037,34 +1109,35 @@ void mySpecial(int key, int x, int y) {
 		// Calculate movement based on current rotation
 		deltaX = xChange[movementState];
 		deltaZ = zChange[movementState];
+		if ((aladdin.position.x + deltaX) <= 59 && (aladdin.position.x + deltaX) >= -37 && (aladdin.position.z + deltaZ) <= 50 && (aladdin.position.z + deltaZ) >= -53) {
+			// Update player position
+			aladdin.position.x += deltaX;
+			aladdin.position.z += deltaZ;
 
-		// Update player position
-		aladdin.position.x += deltaX;
-		aladdin.position.z += deltaZ;
+			std::cout << "aladdin x: " << aladdin.position.x << std::endl;
+			std::cout << "aladdin z: " << aladdin.position.z << std::endl;
+			// Check collision
+			if (checkCollitionObstacles() == 1 && (!endOne)) {
 
-		std::cout << "aladdin x: " << aladdin.position.x << std::endl;
-		std::cout << "aladdin z: " << aladdin.position.z << std::endl;
-		// Check collision
-		if (checkCollitionObstacles()==1 && (!endOne)) {
+				// If collision, revert the position change
+				aladdin.position.x -= deltaX;
+				aladdin.position.z -= deltaZ;
+			}
 
-			// If collision, revert the position change
-			aladdin.position.x -= deltaX;
-			aladdin.position.z -= deltaZ;
+			if (checkCollisionObstacles() == 1 && (endOne)) {
+				aladdin.position.x -= (deltaX + 1.5);
+				aladdin.position.z -= (deltaZ + 1.5);
+			}
+			// Check collectables
+			if (endOne) {
+				checkCollisionCollectables();
+			}
+			else {
+				checkCollitionCollectables();
+			}
+			audioManager.Play("step.wav", 0.03f, false);
+
 		}
-
-		if (checkCollisionObstacles() == 1 && (endOne)) {
-			aladdin.position.x -= (deltaX + 1.5);
-			aladdin.position.z -= (deltaZ + 1.5);
-		}
-		// Check collectables
-		if (endOne) {
-			checkCollisionCollectables();
-		}
-		else {
-			checkCollitionCollectables();
-		}
-		audioManager.Play("step.wav", 0.03f, false);
-
 		break;
 
 	case GLUT_KEY_DOWN:
@@ -1186,6 +1259,7 @@ void main(int argc, char** argv)
 	audioManager.Play("arabianNights.wav", 0.3f, false);
 	glutDisplayFunc(myDisplay);
 	glutTimerFunc(0, myTimer, 0);
+	glutTimerFunc(0, clk, 0);
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecial);
 	glutMotionFunc(myMotion);
@@ -1197,6 +1271,7 @@ void main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
 
