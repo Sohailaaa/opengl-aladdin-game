@@ -23,11 +23,12 @@ constexpr char* audioPath = "C:\\sound";
 // Constants
 //=======================================================================
 Audio audioManager;
+int timer = 180;
 
 float q = 0;
 #define DEG2RAD(a) (a * 0.0174532925)
 const float gravity = -0.3;
-const float initJumpVel = 5;
+const float initJumpVel = 2;
 
 int WIDTH = 1280;
 int HEIGHT = 720;
@@ -84,10 +85,10 @@ public:
 };
 class Direction {
 public:
-	float x,  z;
+	float x, z;
 
 	Direction() {
-		
+
 	}
 
 };
@@ -101,7 +102,7 @@ public:
 	float scale;
 	float collisionRadius;
 	Model_3DS gameObjectModel;
-	bool displayed=true;
+	bool displayed = true;
 	bool needsRotation;
 	Direction direction;
 	bool isCave = false;
@@ -114,7 +115,7 @@ public:
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
-	
+
 		this->needsRotation = needsRotation;
 
 		this->collisionRadius = collisionRadius;
@@ -142,7 +143,7 @@ public:
 	}
 
 	void draw() {
-		if (this->displayed==true) {
+		if (this->displayed == true) {
 			glPushMatrix();
 			glTranslatef(position.x, position.y, position.z);
 			glRotatef(rotation, 0, 1, 0);
@@ -266,8 +267,8 @@ void drawScore() {
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 }
-float r = 0.0;
-float w = 0.0;
+float r = 1179.0;
+float w = 20.0;
 void drawTimer() {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -340,7 +341,6 @@ GameObject treasureBox;
 bool tookt = false;
 
 bool flagFinish = false;
-int timer = 50;
 
 // Textures
 GLTexture tex_ground;
@@ -421,7 +421,7 @@ void InitLightSource()
 
 	// Finally, define light source 0 position in World Space
 	GLfloat light_position[] = { 0.0f, 10.0f, 0.0f, 1.0f };
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position); 
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 	// LIGHT1
 	GLfloat ambient1[] = { 0.1f, 0.1f, 0.1, 1.0f };
@@ -496,7 +496,7 @@ void myInit(void)
 bool checkCaveCollision(Vector pos) {
 	// Implement your rotation collision logic here
 	// Return true if there is a collision, otherwise return false
-if (pos.x > 28 && pos.x < 35 && pos.z > 28 && pos.z < 34) {
+	if (pos.x > 28 && pos.x < 57 && pos.z > 28 && pos.z < 41) {
 		return true;
 	}
 	return false;
@@ -595,7 +595,7 @@ void myDisplay(void)
 	glPopMatrix();
 	// Drawing the Game Objects
 	//aladdin.draw();
-	
+
 
 
 	drawScore();
@@ -605,7 +605,7 @@ void myDisplay(void)
 		glColor3f(0.4, 0.4, 0.4);
 	}
 	else
-		glColor3f(0.6,0.6,0.6);
+		glColor3f(0.6, 0.6, 0.6);
 	GLUquadricObj* qobj;
 	qobj = gluNewQuadric();
 	glTranslated(50, 0, 0);
@@ -646,14 +646,14 @@ void myDisplay(void)
 		}
 
 		for (GameObject wateri : water) {
-			
-				glPushMatrix();
-				
 
-				glTranslatef(0, 1, 0);
-				wateri.draw();
-				glPopMatrix();
-			
+			glPushMatrix();
+
+
+			glTranslatef(0, 1, 0);
+			wateri.draw();
+			glPopMatrix();
+
 		}
 
 		for (GameObject rock : rocks) {
@@ -679,8 +679,8 @@ void myDisplay(void)
 		glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
 		GLfloat lightIntensity1[] = { 0.3, 0.3 ,0.3, 1.0f };
 		glLightfv(GL_LIGHT1, GL_AMBIENT, lightIntensity1);
-			
-		if ( tookd1==false) {
+
+		if (tookd1 == false) {
 			glPushMatrix();
 			diamond1.draw();
 			glPopMatrix();
@@ -723,22 +723,22 @@ void myDisplay(void)
 		}
 
 	}
-		if (flagFinish) {
-			glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			glColor3f(0.0, 0.0, 0.0);
-			renderText("YOU WON :D ", 200.0f, 200.0f, 0.5f);
+	if (flagFinish) {
+		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0.0, 0.0, 0.0);
+		renderText("YOU WON :D ", 200.0f, 200.0f, 0.5f);
 
-			glFlush();
-		}
-		else if(score < 0 || timer < 0)	{
-			glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			glColor3f(0, 0, 0);
-			renderText("YOU LOST :( ", 200.0f, 200.0f, 0.5f);
+		glFlush();
+	}
+	else if (score < 0 || timer < 0) {
+		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0, 0, 0);
+		renderText("YOU LOST :( ", 200.0f, 200.0f, 0.5f);
 
-			glFlush();
-		}
+		glFlush();
+	}
 
 	glutSwapBuffers();
 }
@@ -819,7 +819,7 @@ bool checkCollitionObstacles() {
 bool took = false;
 void checkCollitionCollectables() {
 	for (int i = 0; i < water.size(); i++) {
-		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius-0.252) {
+		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius - 0.252) {
 			if (!took) {
 				std::cout << "dist: " << compareDistances(aladdin.position, water[i].position) << std::endl;
 				audioManager.Play("whoosh.wav", 0.5f, false);
@@ -837,7 +837,7 @@ void checkCollitionCollectables() {
 float p = 0.0;
 bool first2 = true;
 void checkEndOne() {
-	if (aladdin.position.x>28&& aladdin.position.x<35&& aladdin.position.z>28 && aladdin.position.z < 34) {
+	if (aladdin.position.x > 28 && aladdin.position.x < 35 && aladdin.position.z>28 && aladdin.position.z < 34) {
 		if (first2) {
 			audioManager.Play("monsterRoar.wav", 0.5f, false);
 			first2 = false;
@@ -845,7 +845,8 @@ void checkEndOne() {
 		std::cout << "reached " << compareDistances(aladdin.position, cave.position) << std::endl;
 
 
-		endOne = true; }
+		endOne = true;
+	}
 
 
 }
@@ -855,9 +856,9 @@ void myTimer(int) {
 	setCameraFollow();
 	setupCamera();
 	checkEndOne();
-	std::cout << "r " << r << std::endl;
+	std::cout << "x " << aladdin.position.x << std::endl;
 
-	std::cout << "w " << w << std::endl;
+	std::cout << "z " << aladdin.position.z << std::endl;
 
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
 		float newSnakeX;
@@ -872,11 +873,11 @@ void myTimer(int) {
 			newSnakeX = getRandomInt(-48, 48);
 			newSnakeZ = getRandomInt(-48, 48);
 			newSnakePosition = { newSnakeX,0,newSnakeZ };
-			if(checkCaveCollision(newSnakePosition)){
+			if (checkCaveCollision(newSnakePosition)) {
 				tooClose = true;
 			}
 			for (GameObject otherSnake : enemySnakes) {
-				if (compareDistances(otherSnake.position, newSnakePosition) < MIN_ENEMY_CLOSENESS )
+				if (compareDistances(otherSnake.position, newSnakePosition) < MIN_ENEMY_CLOSENESS)
 					tooClose = true;
 			}
 
@@ -985,7 +986,7 @@ void myTimer(int) {
 	rock1 = GameObject({ 10,3,20 }, 0, 40, 0.5, "models/rock2/rock.3ds", true);
 	rock2 = GameObject({ -10, 3, -40 }, 0, 40, 0.5, "models/rock2/rock.3ds", true);
 
-	treasureBox= GameObject({ 20, 0, -50 }, 0, 0.09, 0.5, "models/treasure/treasure.3ds", true);
+	treasureBox = GameObject({ 20, 0, -50 }, 0, 0.09, 0.5, "models/treasure/treasure.3ds", true);
 
 	glutPostRedisplay();
 	glutTimerFunc(1000 / 60, myTimer, 0);
@@ -1010,12 +1011,12 @@ void myKeyboard(unsigned char button, int x, int y)
 		q += 5;
 		break;
 	case 'e':
-		r+=1;
+		r += 1;
 		break;
 	case 'r':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
-	
+
 
 
 
@@ -1058,13 +1059,13 @@ bool checkCollisionObstacles() {
 		return true;
 
 	}
-	if ((aladdin.position.x <= -12 && aladdin.position.x >=- 8) && aladdin.position.y == 0 && (aladdin.position.z <= -42 && aladdin.position.z >= -38)) {
+	if ((aladdin.position.x <= -12 && aladdin.position.x >= -8) && aladdin.position.y == 0 && (aladdin.position.z <= -42 && aladdin.position.z >= -38)) {
 		score -= 1;
 		audioManager.Play("collision.wav", 0.5f, false);
 		return true;
 
 	}
-	if ((aladdin.position.x <= 12 && aladdin.position.x >= 8) && aladdin.position.y == 0 && (aladdin.position.z <=42  && aladdin.position.z >= 38)) {
+	if ((aladdin.position.x <= 12 && aladdin.position.x >= 8) && aladdin.position.y == 0 && (aladdin.position.z <= 42 && aladdin.position.z >= 38)) {
 		score -= 1;
 		audioManager.Play("collision.wav", 0.5f, false);
 		return true;
@@ -1089,15 +1090,15 @@ bool checkCollisionObstacles() {
 
 void checkCollisionCollectables() {
 	if ((aladdin.position.x <= 23 && aladdin.position.x >= 16) && aladdin.position.y == 0 && (aladdin.position.z <= 24 && aladdin.position.z >= 16)) {
-		if (!tookd1 ) {
+		if (!tookd1) {
 			audioManager.Play("whoosh.wav", 0.5f, false);
-			diamond1.displayed=false;
+			diamond1.displayed = false;
 			score += 1;
 			tookd1 = true;
 		}
 
 	}
-	if ((aladdin.position.x <= -26 && aladdin.position.x >= -34) && aladdin.position.y == 0 && (aladdin.position.z <=34  && aladdin.position.z >= 26)) {
+	if ((aladdin.position.x <= -26 && aladdin.position.x >= -34) && aladdin.position.y == 0 && (aladdin.position.z <= 34 && aladdin.position.z >= 26)) {
 		if (!tookd2) {
 			audioManager.Play("whoosh.wav", 0.5f, false);
 			diamond2.displayed = false;
@@ -1114,18 +1115,18 @@ void checkCollisionCollectables() {
 			tookd3 = true;
 		}
 	}
-		if ((aladdin.position.x <= 22 && aladdin.position.x >=18) && aladdin.position.y == 0 && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
-			if (!tookt) {
-				audioManager.Play("whoosh.wav", 0.5f, false);
-				treasureBox.displayed = false;
-				tookt = true;
-				flagFinish = true;
-			}
+	if ((aladdin.position.x <= 22 && aladdin.position.x >= 18) && aladdin.position.y == 0 && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
+		if (!tookt) {
+			audioManager.Play("whoosh.wav", 0.5f, false);
+			treasureBox.displayed = false;
+			tookt = true;
+			flagFinish = true;
+		}
 	}
-	
+
 
 	//glutPostRedisplay();
-	
+
 }
 
 //=======================================================================
@@ -1149,7 +1150,7 @@ void mySpecial(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_UP:
-		
+
 		// Calculate movement based on current rotation
 		deltaX = xChange[movementState];
 		deltaZ = zChange[movementState];
@@ -1158,7 +1159,7 @@ void mySpecial(int key, int x, int y) {
 			aladdin.position.x += deltaX;
 			aladdin.position.z += deltaZ;
 
-	
+
 			// Check collision
 			if (checkCollitionObstacles() == 1 && (!endOne)) {
 
@@ -1189,18 +1190,18 @@ void mySpecial(int key, int x, int y) {
 		aladdin.setRotation(aladdin.rotation - 180);
 
 		// Check collision after reversing direction
-		if (checkCollitionObstacles()==1) {
+		if (checkCollitionObstacles() == 1) {
 			// If collision, revert the rotation change
 			aladdin.setRotation(aladdin.rotation + 180);
 		}
-		
+
 		break;
 
 	case GLUT_KEY_LEFT:
 		temp = movementState;
 		movementState = (movementState - 1 + 8) % 8;
 		aladdin.setRotation(aladdin.rotation + 45);
-		if (checkCollitionObstacles()==1) {
+		if (checkCollitionObstacles() == 1) {
 			movementState = temp;
 		}
 
@@ -1211,10 +1212,10 @@ void mySpecial(int key, int x, int y) {
 		temp = movementState;
 		movementState = (movementState + 1) % 8;
 		aladdin.setRotation(aladdin.rotation - 45);
-		if (checkCollitionObstacles()==1) {
+		if (checkCollitionObstacles() == 1) {
 			movementState = temp;
 		}
-	
+
 
 		break;
 	}
@@ -1306,7 +1307,7 @@ void main(int argc, char** argv)
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecial);
 	glutMotionFunc(myMotion);
-	 glutMouseFunc(myMouse);
+	glutMouseFunc(myMouse);
 	glutReshapeFunc(myReshape);
 
 	myInit();
