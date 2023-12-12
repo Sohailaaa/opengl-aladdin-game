@@ -266,7 +266,48 @@ void drawScore() {
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 }
+float r = 0.0;
+float w = 0.0;
+void drawTimer() {
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, glutGet(GLUT_WINDOW_WIDTH), 0, glutGet(GLUT_WINDOW_HEIGHT));
 
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Define 3D position for the score (you can adjust these values)
+	GLfloat scorePosition[3] = { r, w, 0.0f };
+
+	// Convert 3D world position to screen coordinates
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLint viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	GLdouble winX, winY, winZ;
+	gluProject(scorePosition[0], scorePosition[1], scorePosition[2], modelview, projection, viewport, &winX, &winY, &winZ);
+
+	// Set the raster position in window coordinates
+	glRasterPos2d(winX, glutGet(GLUT_WINDOW_HEIGHT) - winY);
+
+	char scoreText[50];
+	snprintf(scoreText, sizeof(scoreText), "Timer: %d", timer);
+
+	for (int i = 0; scoreText[i] != '\0'; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, scoreText[i]);
+	}
+
+	glPopMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
 //=======================================================================
 // Variables
 //=======================================================================
@@ -558,6 +599,7 @@ void myDisplay(void)
 
 
 	drawScore();
+	drawTimer();
 	glPushMatrix();
 	if (endOne) {
 		glColor3f(0.4, 0.4, 0.4);
@@ -682,17 +724,17 @@ void myDisplay(void)
 
 	}
 		if (flagFinish) {
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
-			glColor3f(0, 1, 0);
+			glColor3f(0.0, 0.0, 0.0);
 			renderText("YOU WON :D ", 200.0f, 200.0f, 0.5f);
 
 			glFlush();
 		}
 		else if(score < 0 || timer < 0)	{
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
-			glColor3f(1, 0, 0);
+			glColor3f(0, 0, 0);
 			renderText("YOU LOST :( ", 200.0f, 200.0f, 0.5f);
 
 			glFlush();
@@ -813,7 +855,9 @@ void myTimer(int) {
 	setCameraFollow();
 	setupCamera();
 	checkEndOne();
+	std::cout << "r " << r << std::endl;
 
+	std::cout << "w " << w << std::endl;
 
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
 		float newSnakeX;
@@ -959,14 +1003,14 @@ void myKeyboard(unsigned char button, int x, int y)
 	switch (button)
 	{
 	case 'w':
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		w += 1;
 
 		break;
 	case 'v':
 		q += 5;
 		break;
 	case 'e':
-		q -= 5;
+		r+=1;
 		break;
 	case 'r':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1114,8 +1158,7 @@ void mySpecial(int key, int x, int y) {
 			aladdin.position.x += deltaX;
 			aladdin.position.z += deltaZ;
 
-			std::cout << "aladdin x: " << aladdin.position.x << std::endl;
-			std::cout << "aladdin z: " << aladdin.position.z << std::endl;
+	
 			// Check collision
 			if (checkCollitionObstacles() == 1 && (!endOne)) {
 

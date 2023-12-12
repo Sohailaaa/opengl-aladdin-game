@@ -7,3 +7,4 @@ C:\Users\20109\Music\Lab 7 (3)\Debug\OpenGLMeshLoader19.exe
 C:\Users\20109\Music\Graphics Project\Debug\OpenGLMeshLoader19.exe
 C:\Users\lenovo\Source\Repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe
 C:\Users\nadak\source\repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe
+D:\Semester 7\Graphics\GraphicsPro\Debug\OpenGLMeshLoader19.exe

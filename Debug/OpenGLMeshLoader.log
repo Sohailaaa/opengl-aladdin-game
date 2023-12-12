@@ -1,10 +1,10 @@
 ﻿  Main.cpp
-C:\Users\nadak\source\repos\opengl-aladdin-game\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\nadak\source\repos\opengl-aladdin-game\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(757,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(766,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(779,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(818,28): warning C4018: '<': signed/unsigned mismatch
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(849,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\nadak\source\repos\opengl-aladdin-game\Main.cpp(886,22): warning C4018: '<': signed/unsigned mismatch
-  OpenGLMeshLoader.vcxproj -> C:\Users\nadak\Source\Repos\opengl-aladdin-game\Debug\OpenGLMeshLoader19.exe
+D:\Semester 7\Graphics\GraphicsPro\TextureBuilder.h(27,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+D:\Semester 7\Graphics\GraphicsPro\TextureBuilder.h(28,52): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(299,54): error C2065: 'timer': undeclared identifier
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(799,21): warning C4018: '<': signed/unsigned mismatch
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(808,21): warning C4018: '<': signed/unsigned mismatch
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(821,20): warning C4018: '<': signed/unsigned mismatch
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(862,28): warning C4018: '<': signed/unsigned mismatch
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(893,22): warning C4018: '<': signed/unsigned mismatch
+D:\Semester 7\Graphics\GraphicsPro\Main.cpp(930,22): warning C4018: '<': signed/unsigned mismatch
