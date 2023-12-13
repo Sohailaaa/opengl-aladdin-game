@@ -106,6 +106,7 @@ public:
 	bool needsRotation;
 	Direction direction;
 	bool isCave = false;
+	bool effect = true;
 	GameObject() {
 	}
 
@@ -797,17 +798,15 @@ void clk(int a) {
 bool checkCollitionObstacles() {
 	if (!endOne) {
 		for (int i = 0; i < enemySnakes.size(); i++) {
-			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius + 2.0) {
-				std::cout << "d: " << compareDistances(aladdin.position, enemySnakes[i].position) << std::endl;
-				audioManager.Play("snake.wav", 0.5f, false);
+			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius-0.5 ) {
+				audioManager.Play("collision.wav", 0.5f, false);
 				score -= 1;
 				return true;
 			}
 
 		}
 		for (int i = 0; i < rocks.size(); i++) {
-			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius + 2.0) {
-				std::cout << "f: " << q << std::endl;
+			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius - 0.3) {
 				audioManager.Play("collision.wav", 0.5f, false);
 				score -= 1;
 				return true;
@@ -819,17 +818,17 @@ bool checkCollitionObstacles() {
 bool took = false;
 void checkCollitionCollectables() {
 	for (int i = 0; i < water.size(); i++) {
-		if (compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius - 0.252) {
+		if (water[i].effect&&compareDistances(aladdin.position, water[i].position) < aladdin.collisionRadius + water[i].collisionRadius -0.04) {
 			if (!took) {
-				std::cout << "dist: " << compareDistances(aladdin.position, water[i].position) << std::endl;
 				audioManager.Play("whoosh.wav", 0.5f, false);
 
 				water[i].setDisapear();
+				water[i].effect = false;
+
 				score += 1;
 				took = true;
 			}
 		}took = false;
-		std::cout << "dist: " << compareDistances(aladdin.position, water[i].position) << std::endl;
 
 	}
 
@@ -839,10 +838,9 @@ bool first2 = true;
 void checkEndOne() {
 	if (aladdin.position.x > 28 && aladdin.position.x < 35 && aladdin.position.z>28 && aladdin.position.z < 34) {
 		if (first2) {
-			audioManager.Play("monsterRoar.wav", 0.5f, false);
+			audioManager.Play("target.wav", 0.5f, false);
 			first2 = false;
 		}
-		std::cout << "reached " << compareDistances(aladdin.position, cave.position) << std::endl;
 
 
 		endOne = true;
@@ -856,9 +854,9 @@ void myTimer(int) {
 	setCameraFollow();
 	setupCamera();
 	checkEndOne();
-	std::cout << "x " << aladdin.position.x << std::endl;
-
-	std::cout << "z " << aladdin.position.z << std::endl;
+	
+	std::cout << "x" << aladdin.position.x<<std::endl;
+	std::cout << "z" << aladdin.position.z << std::endl;
 
 	while (enemySnakes.size() < MAX_NUMBER_OF_ENEMIES) {
 		float newSnakeX;
@@ -1059,6 +1057,13 @@ bool checkCollisionObstacles() {
 		return true;
 
 	}
+
+	if ((aladdin.position.x < -8 && aladdin.position.x >=-12) && (aladdin.position.z <= -35 && aladdin.position.z > -44)) {
+		score -= 1;
+		audioManager.Play("collision.wav", 0.5f, false);
+		return true;
+
+	}
 	if ((aladdin.position.x <= -12 && aladdin.position.x >= -8) && aladdin.position.y == 0 && (aladdin.position.z <= -42 && aladdin.position.z >= -38)) {
 		score -= 1;
 		audioManager.Play("collision.wav", 0.5f, false);
@@ -1098,6 +1103,7 @@ void checkCollisionCollectables() {
 		}
 
 	}
+
 	if ((aladdin.position.x <= -26 && aladdin.position.x >= -34) && aladdin.position.y == 0 && (aladdin.position.z <= 34 && aladdin.position.z >= 26)) {
 		if (!tookd2) {
 			audioManager.Play("whoosh.wav", 0.5f, false);
@@ -1115,9 +1121,9 @@ void checkCollisionCollectables() {
 			tookd3 = true;
 		}
 	}
-	if ((aladdin.position.x <= 22 && aladdin.position.x >= 18) && aladdin.position.y == 0 && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
+	if ((aladdin.position.x <= 25 && aladdin.position.x >= 15) && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
 		if (!tookt) {
-			audioManager.Play("whoosh.wav", 0.5f, false);
+			audioManager.Play("finish.wav", 0.5f, false);
 			treasureBox.displayed = false;
 			tookt = true;
 			flagFinish = true;
