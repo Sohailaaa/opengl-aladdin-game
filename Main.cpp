@@ -798,7 +798,7 @@ void clk(int a) {
 bool checkCollitionObstacles() {
 	if (!endOne) {
 		for (int i = 0; i < enemySnakes.size(); i++) {
-			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius-0.5 ) {
+			if (compareDistances(aladdin.position, enemySnakes[i].position) < aladdin.collisionRadius + enemySnakes[i].collisionRadius-0.1 ) {
 				audioManager.Play("collision.wav", 0.5f, false);
 				score -= 1;
 				return true;
@@ -806,7 +806,7 @@ bool checkCollitionObstacles() {
 
 		}
 		for (int i = 0; i < rocks.size(); i++) {
-			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius - 0.3) {
+			if (compareDistances(aladdin.position, rocks[i].position) < aladdin.collisionRadius + rocks[i].collisionRadius - 0.09) {
 				audioManager.Play("collision.wav", 0.5f, false);
 				score -= 1;
 				return true;
@@ -868,7 +868,7 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newSnakeX = getRandomInt(-48, 48);
+			newSnakeX = getRandomInt(-30, 48);
 			newSnakeZ = getRandomInt(-48, 48);
 			newSnakePosition = { newSnakeX,0,newSnakeZ };
 			if (checkCaveCollision(newSnakePosition)) {
@@ -899,7 +899,7 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newRockX = getRandomInt(-48, 48);
+			newRockX = getRandomInt(-30, 48);
 			newRockZ = getRandomInt(-48, 48);
 			newRockPosition = { newRockX,0,newRockZ };
 			if (checkCaveCollision(newRockPosition)) {
@@ -936,7 +936,7 @@ void myTimer(int) {
 		while (true) {
 			tooClose = false;
 
-			newWaterX = getRandomInt(-48, 48);
+			newWaterX = getRandomInt(-30, 48);
 			newWaterZ = getRandomInt(-48, 48);
 			newWaterPosition = { newWaterX,0,newWaterZ };
 			if (checkCaveCollision(newWaterPosition)) {
@@ -1121,7 +1121,7 @@ void checkCollisionCollectables() {
 			tookd3 = true;
 		}
 	}
-	if ((aladdin.position.x <= 25 && aladdin.position.x >= 15) && (aladdin.position.z <= -48 && aladdin.position.z >= -52)) {
+	if ((aladdin.position.x <= 25 && aladdin.position.x >= 15) && (aladdin.position.z <= -44 && aladdin.position.z >= -52)) {
 		if (!tookt) {
 			audioManager.Play("finish.wav", 0.5f, false);
 			treasureBox.displayed = false;
